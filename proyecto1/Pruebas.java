@@ -16,8 +16,12 @@ public class Pruebas {
 		System.out.println("El núm de vertices del grafo es: " + graph.size());
 		System.out.println("La representación en String del grafo es:");
 		System.out.println(graph);
+		System.out.println("Imprimamos los sucesores de A:");
+		System.out.println(graph.getOutwardEdges("A"));
+		System.out.println("Imprimamos todos los vértices del grafo:");
+		System.out.println(graph.getAllVertices());
 		AdjacencyListGraph<String> graph2 = new AdjacencyListGraph<String>();
-		System.out.println("Creamos un grafo vacío");
+		System.out.println("\nCreamos un grafo vacío");
 		System.out.println("El núm de vertices del grafo es: " + graph2.size());
 		System.out.println("La representación en String del grafo es:");
 		System.out.println(graph2);
