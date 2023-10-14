@@ -10,10 +10,12 @@ import java.util.List;
 
 public class AdjacencyListGraph<T> implements Graph<T> {
 	/*
-	 * Creamos un HashMap que contiene una lista de adyacencia para cada vértice.
-	 * Cada lista de adyacencia contiene los vértices adyacentes al vértice.
+	 * Creamos dos HashMap que contiene una lista de adyacencia para cada vértice.
+	 * El primer HashMap es para los vertices de salida y el segundo para los de
+     * entrada.
 	 */
-	HashMap<T, List<T>> adjacencyList = new HashMap<T, List<T>>();
+	HashMap<T, List<T>> adjacencyListOut = new HashMap<T, List<T>>();
+    HashMap<T, List<T>> adjacencyListIn = new HashMap<T, List<T>>();
 
 	/*
 	 * Recibe un vértice y lo agrega al grafo. Retorna true si el vértice es
@@ -32,7 +34,8 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 		if (vertex == null) {
 			return false;
 		}
-		adjacencyList.put(vertex, new ArrayList<T>());
+		adjacencyListOut.put(vertex, new ArrayList<T>());
+        adjacencyListIn.put(vertex, new ArrayList<T>());
 		return true;
 	}
 
@@ -50,10 +53,11 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 		if (!contains(from) || !contains(to)) {
 			return false;
 		}
-		if (adjacencyList.get(from).contains(to)) {
+		if (adjacencyListOut.get(from).contains(to) || adjacencyListIn.get(to).contains(from)) {
 			return false;
 		}
-		adjacencyList.get(from).add(to);
+		adjacencyListOut.get(from).add(to);
+        adjacencyListIn.get(to).add(from);
 		return true;
 	}
 
@@ -71,10 +75,11 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 		if (!contains(from) || !contains(to)) {
 			return false;
 		}
-		if (!adjacencyList.get(from).contains(to)) {
+		if (!adjacencyListOut.get(from).contains(to) || !adjacencyListIn.get(to).contains(from)) {
 			return false;
 		}
-		adjacencyList.get(from).remove(to);
+		adjacencyListOut.get(from).remove(to);
+        adjacencyListIn.get(to).remove(from);
 		return true;
 	}
 
@@ -84,7 +89,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 * Complejidad: O(1)
 	 */
 	public boolean contains(T vertex) {
-		return adjacencyList.containsKey(vertex);
+		return adjacencyListOut.containsKey(vertex) && adjacencyListIn.containsKey(vertex);
 	}
 
 	/*
@@ -94,7 +99,10 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 * Complejidad:
 	 */
 	public List<T> getInwardEdges(T to) {
-		return null;
+        if (!contains(to)) {
+		    return null;
+        }
+        return adjacencyListIn.get(to);
 	}
 
 	/*
@@ -107,17 +115,27 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 		if (!contains(from)) {
 			return null;
 		}
-		return adjacencyList.get(from);
+		return adjacencyListOut.get(from);
 	}
 
 	/*
 	 * Recibe un vértice v y retorna la lista de vértices adyacentes a v. Es decir,
 	 * retorna la lista de todos los u ∈ V tales que (v, u) ∈ E o (u, v) ∈ E.
 	 * Si ocurre algún error, retorna la referencia null.
-	 * Complejidad:
+	 * Complejidad: O(n)
 	 */
 	public List<T> getVerticesConnectedTo(T vertex) {
-		return null;
+		if (!contains(vertex)) {
+            return null;
+        }
+        List<T> result = new ArrayList<T>();
+        for (T v : adjacencyListOut.get(vertex)) {
+            result.add(v);
+        }
+        for (T v : adjacencyListIn.get(vertex)) {
+            result.add(v);
+        }
+        return result;
 	}
 
 	/*
@@ -126,7 +144,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 * Complejidad: O(1)
 	 */
 	public List<T> getAllVertices() {
-		return adjacencyList.keySet().stream().toList();
+		return adjacencyListOut.keySet().stream().toList();
 	}
 
 	/*
@@ -139,10 +157,14 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 		if (!contains(vertex)) {
 			return false;
 		}
-		adjacencyList.remove(vertex);
-		for (T v : adjacencyList.keySet()) {
-			adjacencyList.get(v).remove(vertex);
-		}
+        adjacencyListOut.remove(vertex);
+        adjacencyListIn.remove(vertex);
+        for (T v : adjacencyListOut.keySet()) {
+            adjacencyListOut.get(v).remove(vertex);
+        }
+        for (T v : adjacencyListIn.keySet()) {
+            adjacencyListIn.get(v).remove(vertex);
+        }
 		return true;
 	}
 
@@ -152,7 +174,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 * Complejidad: O(1)
 	 */
 	public int size() {
-		return adjacencyList.size();
+		return adjacencyListOut.size();
 	}
 
 	/*
@@ -174,8 +196,8 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	@Override
 	public String toString() {
 		String result = "";
-		for (T vertex : adjacencyList.keySet()) {
-			result += "[" + vertex + "] -> " + adjacencyList.get(vertex) + "\n";
+		for (T vertex : adjacencyListOut.keySet()) {
+			result += "[" + vertex + "] -> " + adjacencyListOut.get(vertex) + "\n";
 		}
 		return result;
 	}
