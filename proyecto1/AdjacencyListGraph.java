@@ -5,8 +5,16 @@
 
 import java.util.Collection;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-public class AdjacencyListGraph implements Graph<T> {
+public class AdjacencyListGraph<T> implements Graph<T> {
+    /*
+     * Creamos un HashMap que contiene una lista de adyacencia para cada vértice.
+     * Cada lista de adyacencia contiene los vértices adyacentes al vértice.
+    */
+    HashMap<T, List<T>> adjacencyList = new HashMap<T, List<T>>();
+
     /*
      * Recibe un vértice y lo agrega al grafo. Retorna true si el vértice es
      * agregado con éxito.
@@ -14,7 +22,11 @@ public class AdjacencyListGraph implements Graph<T> {
      * Si el vértice ya existe en el grafo, no se agrega y se retorna false.
      */
     public boolean add(T vertex) {
-        return false;
+        if(contains(vertex)){
+            return false;
+        }
+        adjacencyList.put(vertex, new ArrayList<T>());
+        return true;
     }
 
     /*
@@ -24,7 +36,11 @@ public class AdjacencyListGraph implements Graph<T> {
      * Retorna false en caso contrario.
      */
     public boolean connect(T from, T to) {
-        return false;
+        if(!contains(from) || !contains(to)){
+            return false;
+        }
+        adjacencyList.get(from).add(to);
+        return true;
     }
 
     /*
@@ -34,7 +50,14 @@ public class AdjacencyListGraph implements Graph<T> {
      * Retorna false en caso contrario.
      */
     public boolean disconnect(T from, T to) {
-        return false;
+        if(!contains(from) || !contains(to)){
+            return false;
+        }
+        if(!adjacencyList.get(from).contains(to)){
+            return false;
+        }
+        adjacencyList.get(from).remove(to);
+        return true;
     }
 
     /*
@@ -42,7 +65,7 @@ public class AdjacencyListGraph implements Graph<T> {
      * Retorna false en caso contrario.
      */
     public boolean contains(T vertex) {
-        return false;
+        return adjacencyList.containsKey(vertex);
     }
 
     /*
@@ -77,7 +100,11 @@ public class AdjacencyListGraph implements Graph<T> {
      * Es decir, todos los elementos de V.
      */
     public List<T> getAllVertices() {
-        return null;
+        List<T> vertices = new ArrayList<T>();
+        for (T vertex : adjacencyList.keySet()) {
+            vertices.add(vertex);
+        }
+        return vertices;
     }
 
     /*
@@ -93,7 +120,7 @@ public class AdjacencyListGraph implements Graph<T> {
      * cardinalidad del conjunto de vértices |V|.
      */
     public int size() {
-        return 0;
+        return adjacencyList.size();
     }
 
     /*
