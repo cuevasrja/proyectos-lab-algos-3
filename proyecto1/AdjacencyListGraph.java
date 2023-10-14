@@ -97,10 +97,13 @@ public class AdjacencyListGraph<T> implements Graph<T> {
      * Recibe un vértice v y retorna la lista de sucesores de v. Es decir, retorna
      * la lista de todos los u ∈ V tales que (v, u) ∈ E.
      * Si ocurre algún error, retorna la referencia null.
-     * Complejidad:
+     * Complejidad: O(1)
      */
     public List<T> getOutwardEdges(T from) {
-        return null;
+        if(!contains(from)){
+            return null;
+        }
+        return adjacencyList.get(from).stream().toList();
     }
 
     /*
