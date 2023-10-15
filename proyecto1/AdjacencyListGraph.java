@@ -31,9 +31,11 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 */
 	public boolean add(T vertex) {
 		if (contains(vertex)) {
+			System.out.println("El vértice " + vertex + " ya existe en el grafo");
 			return false;
 		}
 		if (vertex == null) {
+			System.out.println("El vértice es null");
 			return false;
 		}
 		adjacencyListOut.put(vertex, new ArrayList<T>());
@@ -53,9 +55,11 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 */
 	public boolean connect(T from, T to) {
 		if (!contains(from) || !contains(to)) {
+			System.out.println("Alguno de los vértices no existe en el grafo");
 			return false;
 		}
 		if (adjacencyListOut.get(from).contains(to) || adjacencyListIn.get(to).contains(from)) {
+			System.out.println("El arco (" + from + ", " + to + ") ya existe en el grafo");
 			return false;
 		}
 		adjacencyListOut.get(from).add(to);
@@ -75,9 +79,11 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 */
 	public boolean disconnect(T from, T to) {
 		if (!contains(from) || !contains(to)) {
+			System.out.println("Alguno de los vértices no existe en el grafo");
 			return false;
 		}
 		if (!adjacencyListOut.get(from).contains(to) || !adjacencyListIn.get(to).contains(from)) {
+			System.out.println("El arco (" + from + ", " + to + ") no existe en el grafo");
 			return false;
 		}
 		adjacencyListOut.get(from).remove(to);
@@ -102,6 +108,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 */
 	public List<T> getInwardEdges(T to) {
         if (!contains(to)) {
+			System.out.println("El vértice " + to + " no existe en el grafo");
 		    return null;
         }
         return adjacencyListIn.get(to);
@@ -115,6 +122,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 */
 	public List<T> getOutwardEdges(T from) {
 		if (!contains(from)) {
+			System.out.println("El vértice " + from + " no existe en el grafo");
 			return null;
 		}
 		return adjacencyListOut.get(from);
@@ -128,12 +136,14 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 */
 	public List<T> getVerticesConnectedTo(T vertex) {
 		if (!contains(vertex)) {
+			System.out.println("El vértice " + vertex + " no existe en el grafo");
             return null;
         }
         List<T> result = new ArrayList<T>();
         result.addAll(adjacencyListOut.get(vertex));
 		result.addAll(adjacencyListIn.get(vertex));
-        return result.distinct();
+		result = result.stream().distinct().toList();
+        return result;
 	}
 
 	/*
@@ -153,6 +163,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 */
 	public boolean remove(T vertex) {
 		if (!contains(vertex)) {
+			System.out.println("El vértice " + vertex + " no existe en el grafo");
 			return false;
 		}
         adjacencyListOut.remove(vertex);
@@ -176,6 +187,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	}
 
 	/*
+	 TODO: Revisar funcionamiento. Hay un error con el tipo de dato Graph<T> y AdjacencyListGraph<T>
 	 * Recibe una colección V′ de vértices y retorna otra instancia de grafo
 	 * donde el conjunto de vértices contiene solo aquellos vértices presentes en V’
 	 * y solo aquellos arcos asociados a esos vértices. Es decir,
@@ -186,11 +198,13 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 */
 	public Graph<T> subgraph(Collection<T> vertices) {
 		if (vertices == null) {
+			System.out.println("La colección de vértices es null");
 			return null;
 		}
 		AdjacencyListGraph<T> result = new AdjacencyListGraph<T>();
 		for (T vertex : vertices) {
 			if (!contains(vertex)) {
+				System.out.println("El vértice " + vertex + " no existe en el grafo");
 				return null;
 			}
 			result.add(vertex);
