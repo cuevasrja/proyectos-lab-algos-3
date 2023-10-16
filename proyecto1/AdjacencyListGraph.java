@@ -187,7 +187,6 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	}
 
 	/*
-	 TODO: Revisar funcionamiento. Hay un error con el tipo de dato Graph<T> y AdjacencyListGraph<T>
 	 * Recibe una colección V′ de vértices y retorna otra instancia de grafo
 	 * donde el conjunto de vértices contiene solo aquellos vértices presentes en V’
 	 * y solo aquellos arcos asociados a esos vértices. Es decir,

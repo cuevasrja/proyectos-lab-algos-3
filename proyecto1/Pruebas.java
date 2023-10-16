@@ -39,11 +39,10 @@ public class Pruebas {
 		vertices2.add("A");
 		vertices2.add("B");
 		vertices2.add("C");
-		// TODO: Arreglar el subgrafo
-		// AdjacencyListGraph<String> graph3 = graph.subgraph(vertices2);
-		// System.out.println("\nCreamos un subgrafo con los vértices A, B y C");
-		// System.out.println("El núm de vertices del grafo es: " + graph3.size());
-		// System.out.println("La representación en String del grafo es:");
-		// System.out.println(graph3);
+		Graph<String> graph3 = graph.subgraph(vertices2);
+		System.out.println("\nCreamos un subgrafo con los vértices A, B y C");
+		System.out.println("El núm de vertices del grafo es: " + graph3.size());
+		System.out.println("La representación en String del grafo es:");
+		System.out.println(graph3);
 	}
 }
