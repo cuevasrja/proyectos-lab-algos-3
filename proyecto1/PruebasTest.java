@@ -3,7 +3,7 @@ import java.util.Collection;
 
 public class PruebasTest {
     public static void main(String[] args) {
-        AdjacencyListGraph<String> graph = new AdjacencyListGraph<String>();
+        Graph<String> graph = new AdjacencyListGraph<String>();
 
         // Test add method
         graph.add("A");
