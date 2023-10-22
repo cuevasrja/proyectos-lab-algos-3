@@ -3,16 +3,16 @@
  * Autores: Juan Cuevas (19-10056) y Luis Isea (19-10175).
  */
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 public class AdjacencyListGraph<T> implements Graph<T> {
 	/*
 	 * Creamos dos HashMap que contiene una lista de adyacencia para cada vértice.
-	 * El primer HashMap es para los vertices de salida y el segundo para los de
-	 * entrada.
+	 * El primer HashMap es para los sucesores del vértice y el segundo para los
+	 * predecesores.
 	 * Sea el grafo G = (V, E) con |V| = n y |E| = m, ambos HashMap tienen n
 	 * entradas
 	 * y la suma de las longitudes de las listas de adyacencia es 2m.
@@ -24,23 +24,21 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 * Recibe un vértice y lo agrega al grafo. Retorna true si el vértice es
 	 * agregado con éxito.
 	 * Retorna false en caso contrario.
-	 * Si el vértice ya existe en el grafo, no se agrega y se retorna false.
-	 * Si el vértice es null, se retorna false.
-	 * Si el vértice es agregado con éxito, se crea una lista de adyacencia vacía
-	 * para el vértice.
-	 * Complejidad: O(1)
+	 * Complejidad: O(1).
 	 */
 	public boolean add(T vertex) {
+		// Si el vértice ya existe en el grafo, no se agrega y se retorna false.
 		if (contains(vertex)) {
-			System.out.println("El vértice " + vertex + " ya existe en el grafo");
 			return false;
 		}
+		// Si el vértice es null, no se agrega y se retorna false.
 		if (vertex == null) {
-			System.out.println("El vértice es null");
 			return false;
 		}
-		adjacencyListOut.put(vertex, new ArrayList<T>());
-		adjacencyListIn.put(vertex, new ArrayList<T>());
+		// Se mapea el vértice a una lista vacía en ambos HashMap, de sucesores y de
+		// predecesores.
+		adjacencyListOut.put(vertex, new LinkedList<T>());
+		adjacencyListIn.put(vertex, new LinkedList<T>());
 		return true;
 	}
 
@@ -49,21 +47,21 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 * 'from' y entrante a 'to'.
 	 * Retorna true si el arco es agregado con éxito.
 	 * Retorna false en caso contrario.
-	 * Si alguno de los vértices no existe en el grafo, no se agrega el arco y
-	 * se retorna false.
-	 * Si el arco ya existe en el grafo, no se agrega el arco y se retorna false.
-	 * Complejidad: O(1)
+	 * Complejidad: O(1).
 	 */
 	public boolean connect(T from, T to) {
+		// Si alguno de los vértices no existe en el grafo, no se agrega el arco y se
+		// retorna false.
 		if (!contains(from) || !contains(to)) {
-			System.out.println("Alguno de los vértices no existe en el grafo");
 			return false;
 		}
+		// Si el arco ya existe en el grafo, no se agrega el arco y se retorna false.
 		if (adjacencyListOut.get(from).contains(to) || adjacencyListIn.get(to).contains(from)) {
-			System.out.println("El arco (" + from + ", " + to + ") ya existe en el grafo");
 			return false;
 		}
+		// Se añade el vértice 'to' a la lista de sucesores de 'from'.
 		adjacencyListOut.get(from).add(to);
+		// Se añade el vértice 'from' a la lista de predecesores de 'to'.
 		adjacencyListIn.get(to).add(from);
 		return true;
 	}
@@ -73,21 +71,22 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 * 'from' y entrante a 'to'.
 	 * Retorna true si el arco es eliminado con éxito.
 	 * Retorna false en caso contrario.
-	 * Si alguno de los vértices no existe en el grafo, no se elimina el arco y se
-	 * retorna false.
 	 * Si el arco no existe en el grafo, no se elimina el arco y se retorna false.
-	 * Complejidad: O(1)
+	 * Complejidad: O(n). Siendo n la cantidad de vértices.
 	 */
 	public boolean disconnect(T from, T to) {
+		// Si alguno de los vértices no existe en el grafo, no se elimina el arco y se
+		// retorna false.
 		if (!contains(from) || !contains(to)) {
-			System.out.println("Alguno de los vértices no existe en el grafo");
 			return false;
 		}
+		// Si el arco no existe en el grafo, no se elimina el arco y se retorna false.
 		if (!adjacencyListOut.get(from).contains(to) || !adjacencyListIn.get(to).contains(from)) {
-			System.out.println("El arco (" + from + ", " + to + ") no existe en el grafo");
 			return false;
 		}
+		// Se elimina el vértice 'to' de la lista de sucesores de 'from'.
 		adjacencyListOut.get(from).remove(to);
+		// Se elimina el vértice 'from' de la lista de predecesores de 'to'.
 		adjacencyListIn.get(to).remove(from);
 		return true;
 	}
@@ -95,7 +94,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	/*
 	 * Recibe un vértice y retorna true si el vértice pertenece a V.
 	 * Retorna false en caso contrario.
-	 * Complejidad: O(1)
+	 * Complejidad: O(1).
 	 */
 	public boolean contains(T vertex) {
 		return adjacencyListOut.containsKey(vertex);
@@ -108,8 +107,8 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 * Complejidad: O(1)
 	 */
 	public List<T> getInwardEdges(T to) {
+		// Si el vértice no existe en el grafo, se retorna null.
 		if (!contains(to)) {
-			System.out.println("El vértice " + to + " no existe en el grafo");
 			return null;
 		}
 		return adjacencyListIn.get(to);
@@ -119,11 +118,11 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 * Recibe un vértice v y retorna la lista de sucesores de v. Es decir, retorna
 	 * la lista de todos los u ∈ V tales que (v, u) ∈ E.
 	 * Si ocurre algún error, retorna la referencia null.
-	 * Complejidad: O(1)
+	 * Complejidad: O(1).
 	 */
 	public List<T> getOutwardEdges(T from) {
+		// Si el vértice no existe en el grafo, se retorna null.
 		if (!contains(from)) {
-			System.out.println("El vértice " + from + " no existe en el grafo");
 			return null;
 		}
 		return adjacencyListOut.get(from);
@@ -133,24 +132,27 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 * Recibe un vértice v y retorna la lista de vértices adyacentes a v. Es decir,
 	 * retorna la lista de todos los u ∈ V tales que (v, u) ∈ E o (u, v) ∈ E.
 	 * Si ocurre algún error, retorna la referencia null.
-	 * Complejidad: O(1)
+	 * Complejidad: O(n). Siendo n la cantidad de vértices.
 	 */
 	public List<T> getVerticesConnectedTo(T vertex) {
+		// Si el vértice no existe en el grafo, se retorna null.
 		if (!contains(vertex)) {
-			System.out.println("El vértice " + vertex + " no existe en el grafo");
 			return null;
 		}
-		List<T> result = new ArrayList<T>();
-		result.addAll(adjacencyListOut.get(vertex));
+		List<T> result = new LinkedList<T>();
+		for (T edge : adjacencyListOut.get(vertex)) {
+			if (!adjacencyListIn.get(vertex).contains(edge)) {
+				result.add(edge);
+			}
+		}
 		result.addAll(adjacencyListIn.get(vertex));
-		result = result.stream().distinct().toList();
 		return result;
 	}
 
 	/*
 	 * Retorna la lista de todos vértices del grafo.
 	 * Es decir, todos los elementos de V.
-	 * Complejidad: O(1)
+	 * Complejidad: O(1).
 	 */
 	public List<T> getAllVertices() {
 		return adjacencyListOut.keySet().stream().toList();
@@ -159,12 +161,11 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	/*
 	 * Recibe un vértice y lo elimina del grafo. Retorna true si el vértice es
 	 * eliminado con éxito. Retorna false en caso contrario.
-	 * Si el vértice no existe en el grafo, no se elimina y se retorna false.
 	 * Complejidad: O(n). Siendo n la cantidad de vértices.
 	 */
 	public boolean remove(T vertex) {
+		// Si el vértice no existe en el grafo, no se elimina y se retorna false.
 		if (!contains(vertex)) {
-			System.out.println("El vértice " + vertex + " no existe en el grafo");
 			return false;
 		}
 		for (T edge : adjacencyListOut.get(vertex)) {
@@ -181,7 +182,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	/*
 	 * Retorna la cantidad de vértices que contiene el grafo. Es decir, la
 	 * cardinalidad del conjunto de vértices |V|.
-	 * Complejidad: O(1)
+	 * Complejidad: O(1).
 	 */
 	public int size() {
 		return adjacencyListOut.size();
@@ -198,14 +199,14 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 * promedio de arcos por vértice.
 	 */
 	public Graph<T> subgraph(Collection<T> vertices) {
+		// Si la colección de vértices es null, se retorna null.
 		if (vertices == null) {
-			System.out.println("La colección de vértices es null");
 			return null;
 		}
 		AdjacencyListGraph<T> result = new AdjacencyListGraph<T>();
 		for (T vertex : vertices) {
+			// Si alguno de los vértices no existe en el grafo, se retorna null.
 			if (!contains(vertex)) {
-				System.out.println("El vértice " + vertex + " no existe en el grafo");
 				return null;
 			}
 			result.add(vertex);
@@ -223,7 +224,6 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	/*
 	 * Retorna una representación en String del grafo.
 	 * Complejidad: O(n). Siendo n la cantidad de vértices.
-	 * Ya que adjacencyListOut.get(vertex) es O(1) y el for se ejecuta n veces.
 	 */
 	@Override
 	public String toString() {
