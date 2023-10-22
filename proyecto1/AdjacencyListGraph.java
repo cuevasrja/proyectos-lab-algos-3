@@ -12,12 +12,13 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	/*
 	 * Creamos dos HashMap que contiene una lista de adyacencia para cada vértice.
 	 * El primer HashMap es para los vertices de salida y el segundo para los de
-     * entrada.
-	 * Sea el grafo G = (V, E) con |V| = n y |E| = m, ambos HashMap tienen n entradas
+	 * entrada.
+	 * Sea el grafo G = (V, E) con |V| = n y |E| = m, ambos HashMap tienen n
+	 * entradas
 	 * y la suma de las longitudes de las listas de adyacencia es 2m.
 	 */
 	HashMap<T, List<T>> adjacencyListOut = new HashMap<T, List<T>>();
-    HashMap<T, List<T>> adjacencyListIn = new HashMap<T, List<T>>();
+	HashMap<T, List<T>> adjacencyListIn = new HashMap<T, List<T>>();
 
 	/*
 	 * Recibe un vértice y lo agrega al grafo. Retorna true si el vértice es
@@ -39,7 +40,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 			return false;
 		}
 		adjacencyListOut.put(vertex, new ArrayList<T>());
-        adjacencyListIn.put(vertex, new ArrayList<T>());
+		adjacencyListIn.put(vertex, new ArrayList<T>());
 		return true;
 	}
 
@@ -63,7 +64,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 			return false;
 		}
 		adjacencyListOut.get(from).add(to);
-        adjacencyListIn.get(to).add(from);
+		adjacencyListIn.get(to).add(from);
 		return true;
 	}
 
@@ -87,7 +88,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 			return false;
 		}
 		adjacencyListOut.get(from).remove(to);
-        adjacencyListIn.get(to).remove(from);
+		adjacencyListIn.get(to).remove(from);
 		return true;
 	}
 
@@ -97,7 +98,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 * Complejidad: O(1)
 	 */
 	public boolean contains(T vertex) {
-		return adjacencyListOut.containsKey(vertex) && adjacencyListIn.containsKey(vertex);
+		return adjacencyListOut.containsKey(vertex);
 	}
 
 	/*
@@ -107,11 +108,11 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 * Complejidad: O(1)
 	 */
 	public List<T> getInwardEdges(T to) {
-        if (!contains(to)) {
+		if (!contains(to)) {
 			System.out.println("El vértice " + to + " no existe en el grafo");
-		    return null;
-        }
-        return adjacencyListIn.get(to);
+			return null;
+		}
+		return adjacencyListIn.get(to);
 	}
 
 	/*
@@ -137,13 +138,13 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	public List<T> getVerticesConnectedTo(T vertex) {
 		if (!contains(vertex)) {
 			System.out.println("El vértice " + vertex + " no existe en el grafo");
-            return null;
-        }
-        List<T> result = new ArrayList<T>();
-        result.addAll(adjacencyListOut.get(vertex));
+			return null;
+		}
+		List<T> result = new ArrayList<T>();
+		result.addAll(adjacencyListOut.get(vertex));
 		result.addAll(adjacencyListIn.get(vertex));
 		result = result.stream().distinct().toList();
-        return result;
+		return result;
 	}
 
 	/*
@@ -166,14 +167,14 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 			System.out.println("El vértice " + vertex + " no existe en el grafo");
 			return false;
 		}
-        adjacencyListOut.remove(vertex);
-        adjacencyListIn.remove(vertex);
-        for (T v : adjacencyListOut.keySet()) {
-            adjacencyListOut.get(v).remove(vertex);
-        }
-        for (T v : adjacencyListIn.keySet()) {
-            adjacencyListIn.get(v).remove(vertex);
-        }
+		for (T edge : adjacencyListOut.get(vertex)) {
+			adjacencyListIn.get(edge).remove(vertex);
+		}
+		for (T edge : adjacencyListIn.get(vertex)) {
+			adjacencyListOut.get(edge).remove(vertex);
+		}
+		adjacencyListOut.remove(vertex);
+		adjacencyListIn.remove(vertex);
 		return true;
 	}
 
@@ -193,7 +194,8 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 * retorna G′ = (V′, E′)
 	 * donde E′ = {(u, v) ∈ E ∣ u ∈ V′ ∧ v ∈ V′}.
 	 * Si ocurre algún error, retorna la referencia null.
-	 * Complejidad: O(n*m). Siendo n la cantidad de vértices y m la cantidad promedio de arcos por vértice.
+	 * Complejidad: O(n*m). Siendo n la cantidad de vértices y m la cantidad
+	 * promedio de arcos por vértice.
 	 */
 	public Graph<T> subgraph(Collection<T> vertices) {
 		if (vertices == null) {
@@ -221,6 +223,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	/*
 	 * Retorna una representación en String del grafo.
 	 * Complejidad: O(n). Siendo n la cantidad de vértices.
+	 * Ya que adjacencyListOut.get(vertex) es O(1) y el for se ejecuta n veces.
 	 */
 	@Override
 	public String toString() {

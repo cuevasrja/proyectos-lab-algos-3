@@ -28,7 +28,7 @@ public class Pruebas {
 		System.out.println(graph.getVerticesConnectedTo("A"));
 		System.out.println("Imprimamos todos los vértices del grafo:");
 		System.out.println(graph.getAllVertices());
-		
+
 		AdjacencyListGraph<String> graph2 = new AdjacencyListGraph<String>();
 		System.out.println("\nCreamos un grafo vacío");
 		System.out.println("El núm de vertices del grafo es: " + graph2.size());
