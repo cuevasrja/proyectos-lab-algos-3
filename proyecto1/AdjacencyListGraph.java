@@ -140,13 +140,9 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 			return null;
 		}
 		List<T> result = new LinkedList<T>();
-		for (T edge : adjacencyListOut.get(vertex)) {
-			if (!adjacencyListIn.get(vertex).contains(edge)) {
-				result.add(edge);
-			}
-		}
+		result.addAll(adjacencyListOut.get(vertex));
 		result.addAll(adjacencyListIn.get(vertex));
-		return result;
+		return result.stream().distinct().toList();
 	}
 
 	/*
@@ -161,7 +157,8 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	/*
 	 * Recibe un vértice y lo elimina del grafo. Retorna true si el vértice es
 	 * eliminado con éxito. Retorna false en caso contrario.
-	 * Complejidad: O(n). Siendo n la cantidad de vértices.
+	 * Complejidad: O(n*m). Siendo n la cantidad de vértices y m la cantidad
+	 * promedio de arcos por vértice.
 	 */
 	public boolean remove(T vertex) {
 		// Si el vértice no existe en el grafo, no se elimina y se retorna false.
@@ -203,7 +200,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 		if (vertices == null) {
 			return null;
 		}
-		AdjacencyListGraph<T> result = new AdjacencyListGraph<T>();
+		Graph<T> result = new AdjacencyListGraph<T>();
 		for (T vertex : vertices) {
 			// Si alguno de los vértices no existe en el grafo, se retorna null.
 			if (!contains(vertex)) {
