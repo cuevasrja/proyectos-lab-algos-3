@@ -11,7 +11,11 @@ En este proyecto se implementará la representación de un Grafo a través de **
 
 ## Explicación de la Solución Propuesta (con Complejidades)
 
-Lo más interesante de nuestra implementación de una lista de adyacencia es que decidimos no usar un HashMap, sino dos.
+La primera decisión que tomamos fue implementar una lista de adyacencia usando HashMap, en lugar de implementar una lista de listas. Esto se debe a que un HashMap ofrece métodos que son de complejidad O(1), como _put_, _get_ y _remove_. Por lo que la complejidad de los métodos de la lista de adyacencia se verá beneficiada. En cambio, una lista de listas no ofrece la misma eficiencia y los métodos de la lista de adyacencia tendrían una complejidad mayor.
+
+Además, un HashMap nos permite mapear cada vértice a una lista, por lo que nos mantenemos fieles al TAD lista de adyacencia, que es el objetivo de este proyecto.
+
+No obstante, lo más interesante de nuestra implementación de una lista de adyacencia es que decidimos no usar un HashMap, sino dos.
 Esto con el objetivo de contrarrestar unos de los puntos débiles de las listas de adyacencia, que es la búsqueda de los predecesores de un vértice. Para esto, usamos un HashMap que mapea cada vértice a una lista de sus predecesores, y otro que mapea cada vértice a una lista de sus sucesores. De esta manera, la búsqueda de los predecesores de un vértice es de complejidad O(1), y la búsqueda de los sucesores de un vértice es de complejidad O(1) también.
 
 Esto se logra prácticamente duplicando la cantidad de memoria usada, pero obtenemos una mejora en la complejidad y en tiempo de ejecución, que consideramos vale la pena. Además, la complejidad de los otros métodos no se ve afectada, lo que contribuye a nuestra decisión de usar dos HashMaps.
