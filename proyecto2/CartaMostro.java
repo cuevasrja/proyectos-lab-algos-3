@@ -1,15 +1,11 @@
 public class CartaMostro{
-    enum TipoMostro{
-        AGUA, FUEGO, TIERRA, VIENTO, LUZ, OSCURIDAD, DIVINO
-    }
-    
     private String nombre;
     private int nivel;
     private int poder;
-    private TipoMostro tipo;
+    private String tipo;
 
     // Definir el constructor
-    public CartaMostro(String nombre, int nivel, int poder, TipoMostro tipo){
+    public CartaMostro(String nombre, int nivel, int poder, String tipo){
         this.nombre = nombre;
         this.nivel = nivel;
         this.poder = poder;
@@ -29,7 +25,7 @@ public class CartaMostro{
         return this.poder;
     }
 
-    public TipoMostro getTipo(){
+    public String getTipo(){
         return this.tipo;
     }
 
@@ -58,11 +54,16 @@ public class CartaMostro{
         this.poder = poder;
     }
 
-    public void setTipo(TipoMostro tipo){
-        if (tipo == null){
-            System.out.println("El tipo no puede ser nulo");
+    public void setTipo(String tipo){
+        if (tipo == null || tipo.length() == 0){
+            System.out.println("El tipo no puede ser nulo o vacio");
             return;
         }
         this.tipo = tipo;
+    }
+
+    
+    public String toString(){
+        return this.nombre;
     }
 }
