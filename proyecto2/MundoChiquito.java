@@ -19,6 +19,10 @@ public class MundoChiquito{
         // Agregamos las aristas al grafo
         conectarCartasSemejantes(grafo, cartas);
 
+        // Imprimimos el grafo
+        System.out.println("Grafo no dirigido:");
+        System.out.println(grafo);
+
         // Obtenemos las combinaciones de cartas de monstruos con atributos en comun uno a uno
         Set<List<CartaMostro>> combinaciones = backtracking(grafo);
 

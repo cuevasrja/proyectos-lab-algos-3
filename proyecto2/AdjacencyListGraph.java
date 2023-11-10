@@ -57,8 +57,10 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 		}
 		// Se añade el vértice 'to' a la lista de adyacencia de 'from'.
 		adjacencyList.get(from).add(to);
-		// Se añade el vértice 'from' a la lista de adyacencia de 'to'.
-		adjacencyList.get(to).add(from);
+		// Se añade el vértice 'from' a la lista de adyacencia de 'to' si son distintos.
+		if (from != to) {
+			adjacencyList.get(to).add(from);
+		}
 		return true;
 	}
 
