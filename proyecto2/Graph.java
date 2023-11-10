@@ -1,5 +1,4 @@
 import java.util.List;
-import java.util.Collection;
 
 interface Graph<T> {
     boolean add(T vertex);
@@ -11,5 +10,4 @@ interface Graph<T> {
     List<T> getAllVertices();
     boolean remove(T vertex);
     int size();
-    Graph<T> subgraph(Collection<T> vertices);
 }

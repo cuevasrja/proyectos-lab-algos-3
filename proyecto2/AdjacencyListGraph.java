@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class AdjacencyListGraph<T> implements Graph<T> {
-	/*
+	/**
 	 * Representación de un grafo no dirigido mediante listas de adyacencia.
 	 * Creamos el HashMap que contiene una lista de adyacencia para cada vértice.
 	 * El HashMap contiene los vertices adyacentes a cada vértice.
@@ -18,7 +18,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 */
 	HashMap<T, List<T>> adjacencyList = new HashMap<T, List<T>>();
 
-	/*
+	/**
 	 * Recibe un vértice y lo agrega al grafo. Retorna true si el vértice es
 	 * agregado con éxito.
 	 * Retorna false en caso contrario.
@@ -38,7 +38,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 		return true;
 	}
 
-	/*
+	/**
 	 * Recibe dos vértices 'from' y 'to' y agrega al grafo un lado saliente de
 	 * 'from' y entrante a 'to'.
 	 * Retorna true si el lado es agregado con éxito.
@@ -64,7 +64,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 		return true;
 	}
 
-	/*
+	/**
 	 * Recibe dos vértices 'from' y 'to' y elimina del grafo el lado saliente de
 	 * 'from' y entrante a 'to'.
 	 * Retorna true si el lado es eliminado con éxito.
@@ -89,7 +89,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 		return true;
 	}
 
-	/*
+	/**
 	 * Recibe un vértice y retorna true si el vértice pertenece a V.
 	 * Retorna false en caso contrario.
 	 * Complejidad: O(1).
@@ -117,7 +117,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 		return false;
 	}
 
-	/*
+	/**
 	 * Recibe un vértice v y retorna la lista de vértices adyacentes a v. Es decir,
 	 * retorna la lista de todos los u ∈ V tales que {v, u} ∈ E.
 	 * Si ocurre algún error, retorna la referencia null.
@@ -133,7 +133,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 		return result;
 	}
 
-	/*
+	/**
 	 * Retorna la lista de todos vértices del grafo.
 	 * Es decir, todos los elementos de V.
 	 * Complejidad: O(1).
@@ -142,7 +142,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 		return adjacencyList.keySet().stream().toList();
 	}
 
-	/*
+	/**
 	 * Recibe un vértice y lo elimina del grafo. Retorna true si el vértice es
 	 * eliminado con éxito. Retorna false en caso contrario.
 	 * Complejidad: O(n*m). Siendo n la cantidad de vértices y m la cantidad
@@ -163,7 +163,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 		return true;
 	}
 
-	/*
+	/**
 	 * Retorna la cantidad de vértices que contiene el grafo. Es decir, la
 	 * cardinalidad del conjunto de vértices |V|.
 	 * Complejidad: O(1).
@@ -172,42 +172,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 		return adjacencyList.size();
 	}
 
-	/*
-	 * Recibe una colección V′ de vértices y retorna otra instancia de grafo
-	 * donde el conjunto de vértices contiene solo aquellos vértices presentes en V’
-	 * y solo aquellos lados asociados a esos vértices. Es decir,
-	 * retorna G′ = (V′, E′)
-	 * donde E′ = {(u, v) ∈ E ∣ u ∈ V′ ∧ v ∈ V′}.
-	 * Si ocurre algún error, retorna la referencia null.
-	 * Complejidad: O(n*m). Siendo n la cantidad de vértices y m la cantidad
-	 * promedio de lados por vértice.
-	 */
-	public Graph<T> subgraph(Collection<T> vertices) {
-		// Si la colección de vértices es null, se retorna null.
-		if (vertices == null) {
-			return null;
-		}
-		Graph<T> result = new AdjacencyListGraph<T>();
-		for (T vertex : vertices) {
-			// Si alguno de los vértices no existe en el grafo, se retorna null.
-			if (!contains(vertex)) {
-				return null;
-			}
-			result.add(vertex);
-		}
-		for (T vertex : vertices) {
-			for (T edge : adjacencyList.get(vertex)) {
-				// Si el vértice adyacente no existe en la colección de vértices, no se
-				// agrega el lado.
-				if (vertices.contains(edge)) {
-					result.connect(vertex, edge);
-				}
-			}
-		}
-		return result;
-	}
-
-	/*
+	/**
 	 * Retorna una representación en String del grafo.
 	 * Complejidad: O(n). Siendo n la cantidad de vértices.
 	 */

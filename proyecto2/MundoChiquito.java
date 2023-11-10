@@ -106,7 +106,9 @@ public class MundoChiquito{
      */
     public static Set<List<CartaMostro>> backtracking(Graph<CartaMostro> grafo){
         List<CartaMostro> solInicial = new ArrayList<>();
-        return backRec(grafo, solInicial);
+        Set<List<CartaMostro>> combinaciones = new HashSet<>();
+        backRec(grafo, solInicial, combinaciones);
+        return combinaciones;
     }
 
     /**
@@ -116,20 +118,19 @@ public class MundoChiquito{
      * @param sol
      * @return Conjunto de combinaciones de 3 cartas mostro con atributos en comun uno a uno.
      */
-    public static Set<List<CartaMostro>> backRec(Graph<CartaMostro> grafo, List<CartaMostro> sol){
-        Set<List<CartaMostro>> combinaciones = new HashSet<>();
+    public static void backRec(Graph<CartaMostro> grafo, List<CartaMostro> sol, Set<List<CartaMostro>> combinaciones){
         if (sol.size() == 3){
-            combinaciones.add(sol);
-            return combinaciones;
+            List<CartaMostro> solF = new ArrayList<>(sol);
+            combinaciones.add(solF);
+            return;
         }
         for (CartaMostro carta : grafo.getAllVertices()){
             if (esValida(sol, carta)){
                 sol.add(carta);
-                combinaciones.addAll(backRec(grafo, sol));
+                backRec(grafo, sol, combinaciones);
                 sol.remove(carta);
             }
         }
-        return combinaciones;
     }
 
     /**
