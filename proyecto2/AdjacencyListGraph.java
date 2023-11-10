@@ -126,7 +126,9 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 		if (!contains(vertex)) {
 			return null;
 		}
-		return adjacencyList.get(vertex);
+		// Se crea una copia de la lista de adyacencia del vértice y se retorna.
+		List<T> result = new LinkedList<T>(adjacencyList.get(vertex));
+		return result;
 	}
 
 	/*

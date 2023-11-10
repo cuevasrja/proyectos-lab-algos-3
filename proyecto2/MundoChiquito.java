@@ -136,6 +136,10 @@ public class MundoChiquito{
      * @return True si la carta mostro puede ser agregada a la solucion, False en caso contrario.
      */
     public static boolean esValida(List<CartaMostro> sol, CartaMostro carta){
+        // Verificamos el tamaño de la solucion
+        if (sol.size() == 0){
+            return true;
+        }
         // Tomamos el ultimo elemento de la solucion
         CartaMostro ultima = sol.get(sol.size() - 1);
         // No es necesario verificar si la carta ya esta en la solucion, ya que la carta se puede repetir.
