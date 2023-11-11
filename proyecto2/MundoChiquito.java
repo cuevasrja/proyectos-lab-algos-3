@@ -7,7 +7,8 @@ import java.util.Set;
 
 public class MundoChiquito{
     public static void main(String[] args) {
-        String archivo = args[0];
+        // ? Cambiar por args[0] al funcionar bien
+        String archivo = "deck.csv";
         // Leemos el archivo de cartas de monstruos
         List<CartaMostro> cartas = leerArchivo(archivo);
         // Inicializamos nuestro grafo no dirigido
@@ -126,9 +127,12 @@ public class MundoChiquito{
         }
         for (CartaMostro carta : grafo.getAllVertices()){
             if (esValida(sol, carta)){
+                // Agregamos la carta mostro a la solucion
                 sol.add(carta);
+                // Llamamos recursivamente
                 backRec(grafo, sol, combinaciones);
-                sol.remove(carta);
+                // Eliminamos la ultima carta mostro de la solucion (Hay que tener cuidado ya que la carta se puede repetir)
+                sol.remove(sol.size() - 1);
             }
         }
     }
