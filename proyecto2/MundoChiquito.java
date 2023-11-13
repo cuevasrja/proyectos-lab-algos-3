@@ -7,55 +7,47 @@ import java.util.Set;
 
 public class MundoChiquito {
 	public static void main(String[] args) {
-		// Leemos el archivo de cartas de monstruos
+		// Creamos un mazo de cartas mostro leyendo el archivo deck.csv
 		String archivo = "deck.csv";
-		List<CartaMostro> cartas = leerArchivo(archivo);
-		// Inicializamos nuestro grafo no dirigido
-		GraphProj2<CartaMostro> grafo = new AdjacencyListGraphProj2<CartaMostro>();
-		// Agregamos los vértices al grafo, es decir, las cartas de mostro
-		for (CartaMostro carta : cartas) {
-			grafo.add(carta);
+		List<CartaMostro> mazo = cargarMazo(archivo);
+
+		// Creamos el grafo no dirigido del mazo de cartas
+		AdjacencyListGraphProj2<CartaMostro> grafo = createDeckGraph(mazo);
+
+		// Agregamos las aristas al grafo, es decir, conectamos las cartas mostro
+		// que tengan exactamente una característica en común
+		conectarCartasSemejantes(grafo, mazo);
+
+		// Obtenemos todas las ternas de cartas mostro que cumplan los
+		// requisitos de la carta Mundo Chiquito
+		Set<List<CartaMostro>> ternas = backtracking(grafo);
+
+		// Imprimimos las ternas
+		for (List<CartaMostro> terna : ternas) {
+			System.out.println(terna.get(0) + " " + terna.get(1) + " " + terna.get(2));
 		}
-		// Agregamos las aristas al grafo
-		conectarCartasSemejantes(grafo, cartas);
-
-		// Imprimimos el grafo
-		System.out.println("Grafo no dirigido:");
-		System.out.println(grafo);
-
-		// Obtenemos las combinaciones de cartas de monstruos con atributos en común uno
-		// a uno
-		Set<List<CartaMostro>> combinaciones = backtracking(grafo);
-
-		// Imprimimos las combinaciones
-		System.out.println("Combinaciones de cartas de monstruos con atributos en común uno a uno:");
-		for (List<CartaMostro> combinacion : combinaciones) {
-			System.out.println(combinacion);
-		}
-		// Imprimimos la cantidad de combinaciones
-		System.out.println("Cantidad de combinaciones: " + combinaciones.size());
 	}
 
 	/**
-	 * Método que lee un archivo de cartas de monstruos y lo convierte en una lista
-	 * de cartas de monstruos. Complejidad O(n) donde n es el número de cartas de
-	 * monstruos
+	 * Método que lee un archivo de cartas mostro y lo convierte en una lista
+	 * de cartas mostro.
+	 * Complejidad O(n) donde n es el número de cartas mostro
 	 *
 	 * @param nombreArchivo Nombre del archivo a leer
-	 * @return Lista de cartas de monstruos
+	 * @return Lista de cartas mostro
 	 */
-	public static List<CartaMostro> leerArchivo(String nombreArchivo) {
-		// Creamos una lista de cartas de monstruos
+	public static List<CartaMostro> cargarMazo(String nombreArchivo) {
+		// Creamos una lista de cartas mostro
 		List<CartaMostro> cartas = new ArrayList<>();
 
 		// Leemos el archivo de extensión .csv y lo convertimos en una lista de cartas
-		// de monstruos
+		// mostro
 		try {
 			File archivo = new File(nombreArchivo);
 			Scanner lector = new Scanner(archivo);
 			// Ignoramos la primera línea del archivo
 			lector.nextLine();
-			// Leemos el archivo línea por línea y creamos las cartas de monstruos
+			// Leemos el archivo línea por línea y creamos las cartas mostro
 			while (lector.hasNextLine()) {
 				String linea = lector.nextLine();
 				String[] datos = linea.split(",");
@@ -69,17 +61,34 @@ public class MundoChiquito {
 			lector.close();
 			return cartas;
 		} catch (Exception e) {
-			System.out.println("Error al leer el archivo");
+			System.out.println("Error al leer el archivo " + nombreArchivo);
 			return null;
 		}
 	}
 
 	/**
-	 * Método que implementa para agregar las aristas al grafo
-	 * Complejidad O(n^2) donde n es el número de cartas de monstruos
+	 * Método que crea un grafo no dirigido a partir de una lista de cartas mostro
+	 * Complejidad O(n) donde n es el número de cartas mostro
+	 *
+	 * @param cartas Lista de cartas mostro
+	 * @return Grafo no dirigido
+	 */
+	public static AdjacencyListGraphProj2<CartaMostro> createDeckGraph(List<CartaMostro> mazo) {
+		AdjacencyListGraphProj2<CartaMostro> grafo = new AdjacencyListGraphProj2<>();
+		for (CartaMostro carta : mazo) {
+			grafo.add(carta);
+		}
+		return grafo;
+	}
+
+	/**
+	 * Método que agrega las aristas al grafo del mazo de cartas mostro.
+	 * Para agregar una arista entre dos cartas mostro, estas deben tener
+	 * exactamente una característica en común.
+	 * Complejidad O(n^2) donde n es el número de cartas mostro
 	 *
 	 * @param grafo  Grafo no dirigido
-	 * @param cartas Lista de cartas de monstruos
+	 * @param cartas Lista de cartas mostro
 	 */
 	public static void conectarCartasSemejantes(GraphProj2<CartaMostro> grafo, List<CartaMostro> mazo) {
 		for (CartaMostro carta : mazo) {
@@ -90,7 +99,7 @@ public class MundoChiquito {
 				}
 				// Verificamos que las cartas no estén conectadas y que tengan un solo atributo
 				// en común
-				if (!grafo.areConnected(c, carta) && tienenUnAtributoEnComun(carta, c)) {
+				if (!grafo.areConnected(c, carta) && tienenUnaCaracteristicaEnComun(carta, c)) {
 					grafo.connect(c, carta);
 				}
 			}
@@ -98,60 +107,61 @@ public class MundoChiquito {
 	}
 
 	/**
-	 * Método que verifica si existe un solo atributo igual entre dos cartas
-	 * mostro
+	 * Método que verifica si dos cartas mostro tienen exactamente una
+	 * característica
+	 * en común.
 	 * Complejidad O(1)
 	 *
 	 * @param a Carta Mostro
 	 * @param b Carta Mostro
-	 * @return True si las dos cartas tienen un solo atributo en común,
-	 *         False en caso contrario.
+	 * @return True si las dos cartas tienen una sola característica en
+	 *         común, False en caso contrario.
 	 */
-	public static boolean tienenUnAtributoEnComun(CartaMostro a, CartaMostro b) {
-		int atributosEnComun = 0;
+	public static boolean tienenUnaCaracteristicaEnComun(CartaMostro a, CartaMostro b) {
+		int caracteristicasEnComun = 0;
 		if (a.getNivel() == b.getNivel()) {
-			atributosEnComun++;
+			caracteristicasEnComun++;
 		}
 		if (a.getPoder() == b.getPoder()) {
-			atributosEnComun++;
+			caracteristicasEnComun++;
 		}
 		if (a.getTipo().equals(b.getTipo())) {
-			atributosEnComun++;
+			caracteristicasEnComun++;
 		}
-		return atributosEnComun == 1;
+		return caracteristicasEnComun == 1;
 	}
 
 	/**
-	 * Algoritmo de backtracking para encontrar las combinaciones de 3 cartas mostro
+	 * Algoritmo de backtracking para encontrar las ternaes de 3 cartas mostro
 	 * con atributos en común uno a uno.
 	 * Complejidad O(n^3) donde n es el numero de cartas mostro.
 	 *
 	 * @param grafo
-	 * @return Conjunto de combinaciones de 3 cartas mostro con atributos en común
+	 * @return Conjunto de ternaes de 3 cartas mostro con atributos en común
 	 *         uno a uno.
 	 */
 	public static Set<List<CartaMostro>> backtracking(GraphProj2<CartaMostro> grafo) {
 		List<CartaMostro> solInicial = new ArrayList<>();
-		Set<List<CartaMostro>> combinaciones = new HashSet<>();
-		backRec(grafo, solInicial, combinaciones);
-		return combinaciones;
+		Set<List<CartaMostro>> ternaes = new HashSet<>();
+		backRec(grafo, solInicial, ternaes);
+		return ternaes;
 	}
 
 	/**
-	 * Algoritmo de backtracking para encontrar las combinaciones de 3 cartas mostro
+	 * Algoritmo de backtracking para encontrar las ternaes de 3 cartas mostro
 	 * con atributos en común uno a uno.
 	 * Complejidad O(n^3) donde n es el numero de cartas mostro.
 	 *
 	 * @param grafo
 	 * @param sol
-	 * @return Conjunto de combinaciones de 3 cartas mostro con atributos en común
+	 * @return Conjunto de ternaes de 3 cartas mostro con atributos en común
 	 *         uno a uno.
 	 */
 	public static void backRec(GraphProj2<CartaMostro> grafo, List<CartaMostro> sol,
-			Set<List<CartaMostro>> combinaciones) {
+			Set<List<CartaMostro>> ternaes) {
 		if (sol.size() == 3) {
 			List<CartaMostro> solF = new ArrayList<>(sol);
-			combinaciones.add(solF);
+			ternaes.add(solF);
 			return;
 		}
 		for (CartaMostro carta : grafo.getAllVertices()) {
@@ -159,7 +169,7 @@ public class MundoChiquito {
 				// Agregamos la carta mostro a la solución
 				sol.add(carta);
 				// Llamamos recursivamente
-				backRec(grafo, sol, combinaciones);
+				backRec(grafo, sol, ternaes);
 				// Eliminamos la ultima carta mostro de la solución (Hay que tener cuidado ya
 				// que la carta se puede repetir)
 				sol.remove(sol.size() - 1);
@@ -186,6 +196,6 @@ public class MundoChiquito {
 		// No es necesario verificar si la carta ya esta en la solución, ya que la carta
 		// se puede repetir.
 		// Verificamos si la carta mostro es semejante a la ultima carta de la solución
-		return tienenUnAtributoEnComun(carta, ultima);
+		return tienenUnaCaracteristicaEnComun(carta, ultima);
 	}
 }
