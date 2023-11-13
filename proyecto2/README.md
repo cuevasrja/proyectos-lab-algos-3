@@ -57,6 +57,17 @@ java MundoChiquito
 
 ## Explicación de la Solución Propuesta (con Complejidades)
 
+Para resolver el problema planteado, se propuso utilizar la técnica de **Backtracking**. El algoritmo que resuelve el problema se encuentra en el método `findCombinations` de la clase `MundoChiquito`.
+
+_Backtracking_ es una técnica de programación que se basa en la búsqueda exhaustiva de todas las posibles soluciones a un problema, y que va descartando las soluciones que no satisfacen las restricciones del problema. Es decir, se va construyendo una solución candidata, y si esta no satisface las restricciones del problema, se descarta y se construye otra solución candidata. Este proceso se repite hasta que se encuentre una solución que satisfaga las restricciones del problema, o hasta que se hayan probado todas las posibles soluciones.
+
+De forma que en el caso particular de este problema, se crea una lista de carta mostro que representa el mazo y se crea un grafo no dirigido para representar la conexión entre cartas que solo tengan una característica en común entre sí, (esto es un grafo no dirigido, ya que es una relación recíproca). Luego se llama al método `findCombinations` con el grafo y la lista de cartas mostro como parámetros.
+
+El método `findCombinations` se apoya en el método recursivo `findCombinationsRec`, quién va probando por cada carta mostro del mazo, las posibles combinaciones que puede tener con las otras cartas mostro del mazo, hasta que se alcance una terna de 3 cartas mostro que satisfaga las condiciones de Mundo Chiquito. En ese caso, se agrega la terna de cartas mostro a una lista de ternas de cartas mostro, que representa la solución del problema.
+
+Existe el método auxiliar `esValida` que prueba si una solución candidata es válida luego de agregarle una carta mostro. En caso de que al agregar una carta, la solución candidata no sea válida, se retorna false y se descarta que la carta agregada sea parte de la solución candidata.
+En caso contrario, se retorna true y se continúa construyendo la solución candidata, hasta que alcance una terna de 3 cartas mostro que satisfaga las condiciones de Mundo Chiquito.
+
 Dibujamos una tabla con la complejidad de cada método:
 
 | Método | Complejidad |

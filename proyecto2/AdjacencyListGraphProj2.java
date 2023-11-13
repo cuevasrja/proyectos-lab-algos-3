@@ -1,5 +1,5 @@
 /*
- * Proyecto 1 del Laboratorio de Algoritmos y Estructuras de Datos III
+ * Proyecto 2 del Laboratorio de Algoritmos y Estructuras de Datos III
  * Autores: Juan Cuevas (19-10056) y Luis Isea (19-10175).
  */
 

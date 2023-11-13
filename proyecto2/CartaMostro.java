@@ -1,69 +1,73 @@
-public class CartaMostro{
-    private String nombre;
-    private int nivel;
-    private int poder;
-    private String tipo;
+/*
+ * Proyecto 2 del Laboratorio de Algoritmos y Estructuras de Datos III
+ * Autores: Juan Cuevas (19-10056) y Luis Isea (19-10175).
+ */
 
-    // Definir el constructor
-    public CartaMostro(String nombre, int nivel, int poder, String tipo){
-        this.nombre = nombre;
-        this.nivel = nivel;
-        this.poder = poder;
-        this.tipo = tipo;
-    }
+public class CartaMostro {
+	private String nombre;
+	private int nivel;
+	private int poder;
+	private String tipo;
 
-    // Definir los getters
-    public String getNombre(){
-        return this.nombre;
-    }
+	// Definir el constructor
+	public CartaMostro(String nombre, int nivel, int poder, String tipo) {
+		this.nombre = nombre;
+		this.nivel = nivel;
+		this.poder = poder;
+		this.tipo = tipo;
+	}
 
-    public int getNivel(){
-        return this.nivel;
-    }
+	// Definir los getters
+	public String getNombre() {
+		return this.nombre;
+	}
 
-    public int getPoder(){
-        return this.poder;
-    }
+	public int getNivel() {
+		return this.nivel;
+	}
 
-    public String getTipo(){
-        return this.tipo;
-    }
+	public int getPoder() {
+		return this.poder;
+	}
 
-    // Definir los setters
-    public void setNombre(String nombre){
-        if (nombre == null || nombre.length() == 0){
-            System.out.println("El nombre no puede ser nulo o vacio");
-            return;
-        }
-        this.nombre = nombre;
-    }
+	public String getTipo() {
+		return this.tipo;
+	}
 
-    public void setNivel(int nivel){
-        if (nivel < 1 || nivel > 12){
-            System.out.println("El nivel debe estar entre 1 y 12");
-            return;
-        }
-        this.nivel = nivel;
-    }
+	// Definir los setters
+	public void setNombre(String nombre) {
+		if (nombre == null || nombre.length() == 0) {
+			System.out.println("El nombre no puede ser nulo o vacío");
+			return;
+		}
+		this.nombre = nombre;
+	}
 
-    public void setPoder(int poder){
-        if (poder % 50 != 0){
-            System.out.println("El poder debe ser multiplo de 50");
-            return;
-        }
-        this.poder = poder;
-    }
+	public void setNivel(int nivel) {
+		if (nivel < 1 || nivel > 12) {
+			System.out.println("El nivel debe estar entre 1 y 12");
+			return;
+		}
+		this.nivel = nivel;
+	}
 
-    public void setTipo(String tipo){
-        if (tipo == null || tipo.length() == 0){
-            System.out.println("El tipo no puede ser nulo o vacio");
-            return;
-        }
-        this.tipo = tipo;
-    }
+	public void setPoder(int poder) {
+		if (poder % 50 != 0) {
+			System.out.println("El poder debe ser múltiplo de 50");
+			return;
+		}
+		this.poder = poder;
+	}
 
-    
-    public String toString(){
-        return this.nombre;
-    }
+	public void setTipo(String tipo) {
+		if (tipo == null || tipo.length() == 0) {
+			System.out.println("El tipo no puede ser nulo o vacío");
+			return;
+		}
+		this.tipo = tipo;
+	}
+
+	public String toString() {
+		return this.nombre;
+	}
 }

@@ -1,3 +1,8 @@
+/*
+ * Proyecto 2 del Laboratorio de Algoritmos y Estructuras de Datos III
+ * Autores: Juan Cuevas (19-10056) y Luis Isea (19-10175).
+ */
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,7 +25,7 @@ public class MundoChiquito {
 
 		// Obtenemos todas las ternas de cartas mostro que cumplan los
 		// requisitos de la carta Mundo Chiquito
-		Set<List<CartaMostro>> ternas = backtracking(grafo);
+		Set<List<CartaMostro>> ternas = findCombinations(grafo);
 
 		// Imprimimos las ternas
 		for (List<CartaMostro> terna : ternas) {
@@ -132,36 +137,37 @@ public class MundoChiquito {
 	}
 
 	/**
-	 * Algoritmo de backtracking para encontrar las ternaes de 3 cartas mostro
-	 * con atributos en común uno a uno.
+	 * Algoritmo de backtracking para encontrar las ternas de 3 cartas mostro
+	 * con exactamente una característica en común entre una carta y la siguiente.
 	 * Complejidad O(n^3) donde n es el numero de cartas mostro.
 	 *
 	 * @param grafo
-	 * @return Conjunto de ternaes de 3 cartas mostro con atributos en común
-	 *         uno a uno.
+	 * @return Conjunto de ternas de 3 cartas mostro con exactamente una
+	 *         característica en común entre una carta y la siguiente.
 	 */
-	public static Set<List<CartaMostro>> backtracking(GraphProj2<CartaMostro> grafo) {
+	public static Set<List<CartaMostro>> findCombinations(GraphProj2<CartaMostro> grafo) {
 		List<CartaMostro> solInicial = new ArrayList<>();
-		Set<List<CartaMostro>> ternaes = new HashSet<>();
-		backRec(grafo, solInicial, ternaes);
-		return ternaes;
+		Set<List<CartaMostro>> ternas = new HashSet<>();
+		findCombinationsRec(grafo, solInicial, ternas);
+		return ternas;
 	}
 
 	/**
-	 * Algoritmo de backtracking para encontrar las ternaes de 3 cartas mostro
-	 * con atributos en común uno a uno.
+	 * Algoritmo de backtracking recursivo para encontrar las ternas de 3 cartas
+	 * mostro con exactamente una característica en común entre una carta y la
+	 * siguiente.
 	 * Complejidad O(n^3) donde n es el numero de cartas mostro.
 	 *
 	 * @param grafo
 	 * @param sol
-	 * @return Conjunto de ternaes de 3 cartas mostro con atributos en común
+	 * @return Conjunto de ternas de 3 cartas mostro con atributos en común
 	 *         uno a uno.
 	 */
-	public static void backRec(GraphProj2<CartaMostro> grafo, List<CartaMostro> sol,
-			Set<List<CartaMostro>> ternaes) {
+	public static void findCombinationsRec(GraphProj2<CartaMostro> grafo, List<CartaMostro> sol,
+			Set<List<CartaMostro>> ternas) {
 		if (sol.size() == 3) {
 			List<CartaMostro> solF = new ArrayList<>(sol);
-			ternaes.add(solF);
+			ternas.add(solF);
 			return;
 		}
 		for (CartaMostro carta : grafo.getAllVertices()) {
@@ -169,7 +175,7 @@ public class MundoChiquito {
 				// Agregamos la carta mostro a la solución
 				sol.add(carta);
 				// Llamamos recursivamente
-				backRec(grafo, sol, ternaes);
+				findCombinationsRec(grafo, sol, ternas);
 				// Eliminamos la ultima carta mostro de la solución (Hay que tener cuidado ya
 				// que la carta se puede repetir)
 				sol.remove(sol.size() - 1);
