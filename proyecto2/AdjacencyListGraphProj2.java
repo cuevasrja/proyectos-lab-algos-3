@@ -3,12 +3,11 @@
  * Autores: Juan Cuevas (19-10056) y Luis Isea (19-10175).
  */
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-public class AdjacencyListGraph<T> implements Graph<T> {
+public class AdjacencyListGraphProj2<T> implements GraphProj2<T> {
 	/**
 	 * Representación de un grafo no dirigido mediante listas de adyacencia.
 	 * Creamos el HashMap que contiene una lista de adyacencia para cada vértice.
@@ -121,7 +120,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 * Recibe un vértice v y retorna la lista de vértices adyacentes a v. Es decir,
 	 * retorna la lista de todos los u ∈ V tales que {v, u} ∈ E.
 	 * Si ocurre algún error, retorna la referencia null.
-	 * Complejidad: O(1). 
+	 * Complejidad: O(1).
 	 */
 	public List<T> getVerticesConnectedTo(T vertex) {
 		// Si el vértice no existe en el grafo, se retorna null.
