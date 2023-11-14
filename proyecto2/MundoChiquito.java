@@ -4,11 +4,9 @@
 */
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Set;
 
 public class MundoChiquito {
 	public static void main(String[] args) {
@@ -25,7 +23,7 @@ public class MundoChiquito {
 
 		// Obtenemos todas las ternas de cartas mostro que cumplan los
 		// requisitos de la carta Mundo Chiquito.
-		Set<List<CartaMostro>> ternas = findCombinations(grafo);
+		List<List<CartaMostro>> ternas = findCombinations(grafo);
 
 		// Imprimimos las ternas.
 		for (List<CartaMostro> terna : ternas) {
@@ -44,7 +42,7 @@ public class MundoChiquito {
 	 */
 	public static List<CartaMostro> cargarMazo(String nombreArchivo) {
 		// Creamos una lista de cartas mostro.
-		List<CartaMostro> cartas = new ArrayList<>();
+		List<CartaMostro> cartas = new LinkedList<>();
 
 		// Leemos el archivo de extensión .csv y lo convertimos en una lista de cartas
 		// mostro.
@@ -147,13 +145,20 @@ public class MundoChiquito {
 	 * Es decir, complejidad O(|V|^3).
 	 *
 	 * @param grafo Grafo no dirigido.
-	 * @return Conjunto de ternas de cartas mostro que cumplen con las condiciones
-	 *         de la carta Mundo Chiquito.
+	 * @return Conjunto de ternas de cartas mostro ordenadas alfabéticamente que
+	 *         cumplen con las condiciones de la carta Mundo Chiquito.
 	 */
-	public static Set<List<CartaMostro>> findCombinations(GraphProj2<CartaMostro> grafo) {
-		List<CartaMostro> solInicial = new ArrayList<>();
-		Set<List<CartaMostro>> combinaciones = new HashSet<>();
+	public static List<List<CartaMostro>> findCombinations(GraphProj2<CartaMostro> grafo) {
+		List<CartaMostro> solInicial = new LinkedList<>();
+		List<List<CartaMostro>> combinaciones = new LinkedList<>();
 		findCombinationsRec(grafo, solInicial, combinaciones);
+		// Ordenamos las combinaciones de cartas mostro por nombre.
+		// Esta es una operación menor a O(|V|^3), por lo que no afecta la complejidad.
+		combinaciones.sort((a, b) -> {
+			String nombreA = a.get(0).getNombre() + a.get(1).getNombre() + a.get(2).getNombre();
+			String nombreB = b.get(0).getNombre() + b.get(1).getNombre() + b.get(2).getNombre();
+			return nombreA.compareTo(nombreB);
+		});
 		return combinaciones;
 	}
 
@@ -170,12 +175,12 @@ public class MundoChiquito {
 	 *                      condiciones de la carta Mundo Chiquito.
 	 */
 	public static void findCombinationsRec(GraphProj2<CartaMostro> grafo, List<CartaMostro> solParcial,
-			Set<List<CartaMostro>> combinaciones) {
+			List<List<CartaMostro>> combinaciones) {
 		// Verificamos si la solución parcial tiene 3 cartas mostro
 		// Si es así, entonces la solución parcial es una solución final.
 		if (solParcial.size() == 3) {
 			// Creamos una copia de la solución parcial.
-			List<CartaMostro> solFinal = new ArrayList<>(solParcial);
+			List<CartaMostro> solFinal = new LinkedList<>(solParcial);
 			// Agregamos la solución final al conjunto de combinaciones.
 			combinaciones.add(solFinal);
 			return;
