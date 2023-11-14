@@ -5,10 +5,9 @@
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Set;
 
 public class MundoChiquito {
 	public static void main(String[] args) {
@@ -25,7 +24,7 @@ public class MundoChiquito {
 
 		// Obtenemos todas las ternas de cartas mostro que cumplan los
 		// requisitos de la carta Mundo Chiquito
-		Set<List<CartaMostro>> ternas = findCombinations(grafo);
+		List<List<CartaMostro>> ternas = findCombinations(grafo);
 
 		// Imprimimos las ternas
 		for (List<CartaMostro> terna : ternas) {
@@ -137,71 +136,42 @@ public class MundoChiquito {
 	}
 
 	/**
-	 * Algoritmo de backtracking para encontrar las ternas de 3 cartas mostro
-	 * con exactamente una característica en común entre una carta y la siguiente.
+	 * Algoritmo que encuentra todas las ternas de cartas mostro que cumplen
+	 * con los requisitos de la carta Mundo Chiquito.
 	 * Complejidad O(n^3) donde n es el numero de cartas mostro.
 	 *
 	 * @param grafo
 	 * @return Conjunto de ternas de 3 cartas mostro con exactamente una
 	 *         característica en común entre una carta y la siguiente.
 	 */
-	public static Set<List<CartaMostro>> findCombinations(GraphProj2<CartaMostro> grafo) {
-		List<CartaMostro> solInicial = new ArrayList<>();
-		Set<List<CartaMostro>> ternas = new HashSet<>();
-		findCombinationsRec(grafo, solInicial, ternas);
-		return ternas;
-	}
-
-	/**
-	 * Algoritmo de backtracking recursivo para encontrar las ternas de 3 cartas
-	 * mostro con exactamente una característica en común entre una carta y la
-	 * siguiente.
-	 * Complejidad O(n^3) donde n es el numero de cartas mostro.
-	 *
-	 * @param grafo
-	 * @param sol
-	 * @return Conjunto de ternas de 3 cartas mostro con atributos en común
-	 *         uno a uno.
-	 */
-	public static void findCombinationsRec(GraphProj2<CartaMostro> grafo, List<CartaMostro> sol,
-			Set<List<CartaMostro>> ternas) {
-		if (sol.size() == 3) {
-			List<CartaMostro> solF = new ArrayList<>(sol);
-			ternas.add(solF);
-			return;
-		}
+	public static List<List<CartaMostro>> findCombinations(GraphProj2<CartaMostro> grafo) {
+		List<CartaMostro> sol = new ArrayList<>();
+		List<List<CartaMostro>> ternas = new LinkedList<>();
 		for (CartaMostro carta : grafo.getAllVertices()) {
-			if (esValida(sol, carta)) {
-				// Agregamos la carta mostro a la solución
-				sol.add(carta);
-				// Llamamos recursivamente
-				findCombinationsRec(grafo, sol, ternas);
-				// Eliminamos la ultima carta mostro de la solución (Hay que tener cuidado ya
-				// que la carta se puede repetir)
-				sol.remove(sol.size() - 1);
+			// Agregamos la primera carta mostro a la solución parcial
+			sol.add(carta);
+			// Ahora probamos con las cartas mostro que son adyacentes a la carta mostro
+			// agregada
+			for (CartaMostro adyacente : grafo.getVerticesConnectedTo(carta)) {
+				sol.add(adyacente);
+				for (CartaMostro adyacente2 : grafo.getVerticesConnectedTo(adyacente)) {
+					sol.add(adyacente2);
+					// Al añadir la tercera carta mostro, llegamos a una terna completa
+					// y la agregamos al conjunto de ternas
+					ternas.add(sol);
+					// Removemos la tercera carta mostro de la solución parcial y probamos con
+					// la siguiente carta adyacente2
+					sol.remove(adyacente2);
+				}
+				// Una vez que probamos todas las ternas posibles que tienen como segunda carta
+				// a `adyacente` y empiezan en `carta`, probamos con la siguiente carta
+				// adyacente
+				sol.remove(adyacente);
 			}
+			// Una vez que probamos todas las ternas posibles que comienzan con `carta`, la
+			// removemos de la solución parcial y probamos con la siguiente carta
+			sol.remove(carta);
 		}
-	}
-
-	/**
-	 * Método que verifica si una carta mostro puede ser agregada a una solución.
-	 * Complejidad O(1)
-	 *
-	 * @param sol
-	 * @param carta
-	 * @return True si la carta mostro puede ser agregada a la solución, False en
-	 *         caso contrario.
-	 */
-	public static boolean esValida(List<CartaMostro> sol, CartaMostro carta) {
-		// Verificamos el tamaño de la solución
-		if (sol.size() == 0) {
-			return true;
-		}
-		// Tomamos el ultimo elemento de la solución
-		CartaMostro ultima = sol.get(sol.size() - 1);
-		// No es necesario verificar si la carta ya esta en la solución, ya que la carta
-		// se puede repetir.
-		// Verificamos si la carta mostro es semejante a la ultima carta de la solución
-		return tienenUnaCaracteristicaEnComun(carta, ultima);
+		return ternas;
 	}
 }
