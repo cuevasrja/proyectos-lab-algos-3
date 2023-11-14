@@ -57,24 +57,33 @@ java MundoChiquito
 
 ## Explicación de la Solución Propuesta (con Complejidades)
 
-Para resolver el problema planteado, se propuso utilizar la técnica de **Backtracking**. El algoritmo que resuelve el problema se encuentra en el método `findCombinations` de la clase `MundoChiquito`.
+Para resolver el problema planteado, se propuso utilizar un algoritmo inspirado en la técnica de **Backtracking**. El algoritmo que resuelve el problema se encuentra en el método `findCombinations` de la clase `MundoChiquito`.
 
-_Backtracking_ es una técnica de programación que se basa en la búsqueda exhaustiva de todas las posibles soluciones a un problema, y que va descartando las soluciones que no satisfacen las restricciones del problema. Es decir, se va construyendo una solución candidata, y si esta no satisface las restricciones del problema, se descarta y se construye otra solución candidata. Este proceso se repite hasta que se encuentre una solución que satisfaga las restricciones del problema, o hasta que se hayan probado todas las posibles soluciones.
+_Backtracking_ es una técnica de programación que se basa en la búsqueda exhaustiva de todas las posibles soluciones a un problema, y que va descartando las soluciones que no satisfacen las restricciones del problema. Es decir, se va construyendo una solución candidata, y si esta no satisface las restricciones del problema, se descarta y se construye otra solución candidata. Este proceso se repite hasta que se encuentren todas las soluciones candidatas que satisfagan las restricciones del problema, probando todas las posibles combinaciones de soluciones candidatas.
 
-De forma que en el caso particular de este problema, se crea una lista de carta mostro que representa el mazo y se crea un grafo no dirigido para representar la conexión entre cartas que solo tengan una característica en común entre sí, (esto es un grafo no dirigido, ya que es una relación recíproca). Luego se llama al método `findCombinations` con el grafo y la lista de cartas mostro como parámetros.
+Así, para la resolución de este problema, empezamos por crear una lista de carta mostro que representa el mazo y creamos un grafo no dirigido para representar la conexión entre cartas que solo tengan una característica en común entre sí, (esto es un grafo no dirigido, ya que es una relación recíproca). Luego llamamos al método `findCombinations` con el grafo como parámetro, que a su vez llama al método `findCombinationsRec` que es su método recursivo auxiliar.
 
-El método `findCombinations` se apoya en el método recursivo `findCombinationsRec`, quién va probando por cada carta mostro del mazo, las posibles combinaciones que puede tener con las otras cartas mostro del mazo, hasta que se alcance una terna de 3 cartas mostro que satisfaga las condiciones de Mundo Chiquito. En ese caso, se agrega la terna de cartas mostro a una lista de ternas de cartas mostro, que representa la solución del problema.
+El método `findCombinationsRec` busca todas las posibles combinaciones de cartas mostro que satisfacen las condiciones de Mundo Chiquito. Para ello, en vez de buscar todas las posibles combinaciones de cartas mostro, busca todas las posibles combinaciones de cartas mostro que estén conectadas en el grafo. Es decir, empieza con cualquier carta mostro del mazo, y luego busca todas las posibles combinaciones de segundas cartas mostro que estén conectadas con esa primera carta mostro, y para cada una de esas segundas cartas mostro, busca todas las posibles combinaciones de terceras cartas mostro que estén conectadas con la segunda carta mostro. Una vez añadidas todas estas posibilidades, cambia la primera carta por otra del mazo y repite el proceso. Esto se repite hasta que se hayan probado todas las posibles combinaciones de cartas mostro que estén conectadas entre sí.
 
-Existe el método auxiliar `esValida` que prueba si una solución candidata es válida luego de agregarle una carta mostro. En caso de que al agregar una carta, la solución candidata no sea válida, se retorna false y se descarta que la carta agregada sea parte de la solución candidata.
-En caso contrario, se retorna true y se continúa construyendo la solución candidata, hasta que alcance una terna de 3 cartas mostro que satisfaga las condiciones de Mundo Chiquito.
+Con esto logramos reducir espacio de búsqueda y así reducir la complejidad del caso promedio y del mejor caso del algoritmo. La complejidad del peor caso no se puede reducir, ya que en el peor caso todas las cartas mostro están conectadas entre sí, y por lo tanto se deben probar todas las posibles combinaciones de cartas mostro.
+
+La otra diferencia que hay con un algoritmo de _Backtracking_ tradicional, es que no hace falta probar que la solución candidata satisfaga las restricciones del problema, ya que el grafo se encarga de eso. Es decir, si la solución candidata no satisface las restricciones del problema, entonces el grafo no tendrá una arista entre dos cartas mostro de la solución candidata, y por lo tanto no se considerará como una solución válida.
+
+Por eso decimos que nos inspiramos en la técnica de _Backtracking_, ya que no es un algoritmo de _Backtracking_ tradicional, pero se basa en la misma idea, pero con algunas modificaciones para reducir la complejidad del caso promedio y del mejor caso. Para esto se usa el método `cartasValidas` que proporciona la lista de cartas mostro con la que se debe construir o completar la solución candidata.
 
 Dibujamos una tabla con la complejidad de cada método:
 
-| Método | Complejidad |
-| ------ | ----------- |
-|        |             |
+| Método              | Complejidad |
+| ------------------- | ----------- |
+| cargarMazo          | O(\|V\|)    |
+| createDeckGraph     | O(\|V\|)    |
+| conectarCartas      | O(\|V\|^2)  |
+| unaCaractEnComun    | O(1)        |
+| findCombinations    | O(\|V\|^3)  |
+| findCombinationsRec | O(\|V\|^3)  |
+| cartasValidas       | O(1)        |
 
-**Nota**:
+Donde `|V|` es la cardinalidad del grafo no dirigido del mazo, es decir, la cantidad de cartas mostro en el mazo.
 
 ## Grupo de Laboratorio
 
