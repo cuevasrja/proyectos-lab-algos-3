@@ -5,9 +5,10 @@
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 public class MundoChiquito {
 	public static void main(String[] args) {
@@ -24,7 +25,7 @@ public class MundoChiquito {
 
 		// Obtenemos todas las ternas de cartas mostro que cumplan los
 		// requisitos de la carta Mundo Chiquito
-		List<List<CartaMostro>> ternas = findCombinations(grafo);
+		Set<List<CartaMostro>> ternas = findCombinations(grafo);
 
 		// Imprimimos las ternas
 		for (List<CartaMostro> terna : ternas) {
@@ -144,33 +145,35 @@ public class MundoChiquito {
 	 * @return Conjunto de ternas de 3 cartas mostro con exactamente una
 	 *         característica en común entre una carta y la siguiente.
 	 */
-	public static List<List<CartaMostro>> findCombinations(GraphProj2<CartaMostro> grafo) {
-		List<CartaMostro> sol = new ArrayList<>();
-		List<List<CartaMostro>> ternas = new LinkedList<>();
+	public static Set<List<CartaMostro>> findCombinations(GraphProj2<CartaMostro> grafo) {
+		List<CartaMostro> solParcial = new ArrayList<>();
+		List<CartaMostro> solCompleta = new ArrayList<>();
+		Set<List<CartaMostro>> ternas = new HashSet<>();
 		for (CartaMostro carta : grafo.getAllVertices()) {
 			// Agregamos la primera carta mostro a la solución parcial
-			sol.add(carta);
+			solParcial.add(carta);
 			// Ahora probamos con las cartas mostro que son adyacentes a la carta mostro
 			// agregada
 			for (CartaMostro adyacente : grafo.getVerticesConnectedTo(carta)) {
-				sol.add(adyacente);
+				solParcial.add(adyacente);
 				for (CartaMostro adyacente2 : grafo.getVerticesConnectedTo(adyacente)) {
-					sol.add(adyacente2);
+					solParcial.add(adyacente2);
 					// Al añadir la tercera carta mostro, llegamos a una terna completa
 					// y la agregamos al conjunto de ternas
-					ternas.add(sol);
+					solCompleta = new ArrayList<>(solParcial);
+					ternas.add(solCompleta);
 					// Removemos la tercera carta mostro de la solución parcial y probamos con
 					// la siguiente carta adyacente2
-					sol.remove(adyacente2);
+					solParcial.remove(adyacente2);
 				}
 				// Una vez que probamos todas las ternas posibles que tienen como segunda carta
 				// a `adyacente` y empiezan en `carta`, probamos con la siguiente carta
 				// adyacente
-				sol.remove(adyacente);
+				solParcial.remove(adyacente);
 			}
 			// Una vez que probamos todas las ternas posibles que comienzan con `carta`, la
 			// removemos de la solución parcial y probamos con la siguiente carta
-			sol.remove(carta);
+			solParcial.remove(carta);
 		}
 		return ternas;
 	}
