@@ -95,7 +95,7 @@ public class MundoChiquito {
 	 *
 	 * Esto, porque pese a realizar solo dos bucles anidados de |V| iteraciones, se
 	 * realiza la operación grafo.connect() que también es O(|V|) dentro de ese
-	 * bucle anidado.
+	 * bucle anidado. Por lo tanto, la complejidad es O(|V|^3).
 	 *
 	 * @param grafo  Grafo no dirigido.
 	 * @param cartas Lista de cartas de monstruos.

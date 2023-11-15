@@ -38,13 +38,14 @@ public class AdjacencyListGraphProj2<T> implements GraphProj2<T> {
 	}
 
 	/**
-	 * Recibe dos vértices 'from' y 'to' y agrega al grafo un lado saliente de
-	 * 'from' y entrante a 'to'.
+	 * Recibe dos vértices 'from' y 'to' y agrega al grafo la arista que une a
+	 * 'from' y 'to'.
 	 * Retorna true si el lado es agregado con éxito.
 	 * Retorna false en caso contrario.
 	 * Complejidad: O(n). Siendo n la cantidad de vértices.
-	 * Ya que se debe verificar que el arco no exista en el grafo.
-	 * Y para ello se debe recorrer la lista de sucesores de 'from'.
+	 * Ya que se debe verificar que la arista no exista en el grafo.
+	 * Y para ello se debe recorrer la lista de adyacencia de 'from' buscando a
+	 * 'to'.
 	 */
 	public boolean connect(T from, T to) {
 		// Si alguno de los vértices no existe en el grafo, no se agrega el lado y se
@@ -66,8 +67,8 @@ public class AdjacencyListGraphProj2<T> implements GraphProj2<T> {
 	}
 
 	/**
-	 * Recibe dos vértices 'from' y 'to' y elimina del grafo el lado saliente de
-	 * 'from' y entrante a 'to'.
+	 * Recibe dos vértices 'from' y 'to' y elimina del grafo la arista que une a
+	 * 'from' y 'to'.
 	 * Retorna true si el lado es eliminado con éxito.
 	 * Retorna false en caso contrario.
 	 * Si el lado no existe en el grafo, no se elimina el lado y se retorna false.
@@ -103,7 +104,7 @@ public class AdjacencyListGraphProj2<T> implements GraphProj2<T> {
 	 * Recibe dos vértices 'from' y 'to' y retorna true si existe una arista entre
 	 * ellos. Retorna false en caso contrario.
 	 * Complejidad: O(n). Siendo n la cantidad de vértices.
-	 * Ya que se recorre la lista de sucesores de 'from' y se busca 'to'.
+	 * Ya que se recorre la lista de adyacencia de 'from' y se busca 'to'.
 	 */
 	public boolean areConnected(T from, T to) {
 		// Si alguno de los vértices no existe en el grafo, no están conectados y se

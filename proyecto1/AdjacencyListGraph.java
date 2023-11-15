@@ -49,7 +49,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 * Retorna false en caso contrario.
 	 * Complejidad: O(n). Siendo n la cantidad de vértices.
 	 * Ya que se debe verificar que el arco no exista en el grafo.
-	 * Y para ello se debe recorrer la lista de sucesores de 'from'.
+	 * Y para ello se debe recorrer la lista de sucesores de 'from' buscando 'to'.
 	 */
 	public boolean connect(T from, T to) {
 		// Si alguno de los vértices no existe en el grafo, no se agrega el arco y se
