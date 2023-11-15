@@ -90,8 +90,12 @@ public class MundoChiquito {
 	/**
 	 * Método que agrega las aristas al grafo. Es decir, conecta las cartas mostro
 	 * que tengan exactamente una característica en común.
-	 * Complejidad O(n^2) donde n es el número de cartas de monstruos (|V| = n).
-	 * Es decir, complejidad O(|V|^2).
+	 * Complejidad O(n^3) donde n es el número de cartas de monstruos (|V| = n).
+	 * Es decir, complejidad O(|V|^3).
+	 *
+	 * Esto, porque pese a realizar solo dos bucles anidados de |V| iteraciones, se
+	 * realiza la operación grafo.connect() que también es O(|V|) dentro de ese
+	 * bucle anidado.
 	 *
 	 * @param grafo  Grafo no dirigido.
 	 * @param cartas Lista de cartas de monstruos.

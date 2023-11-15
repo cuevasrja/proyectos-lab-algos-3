@@ -42,7 +42,9 @@ public class AdjacencyListGraphProj2<T> implements GraphProj2<T> {
 	 * 'from' y entrante a 'to'.
 	 * Retorna true si el lado es agregado con éxito.
 	 * Retorna false en caso contrario.
-	 * Complejidad: O(1).
+	 * Complejidad: O(n). Siendo n la cantidad de vértices.
+	 * Ya que se debe verificar que el arco no exista en el grafo.
+	 * Y para ello se debe recorrer la lista de sucesores de 'from'.
 	 */
 	public boolean connect(T from, T to) {
 		// Si alguno de los vértices no existe en el grafo, no se agrega el lado y se
@@ -100,7 +102,8 @@ public class AdjacencyListGraphProj2<T> implements GraphProj2<T> {
 	/**
 	 * Recibe dos vértices 'from' y 'to' y retorna true si existe una arista entre
 	 * ellos. Retorna false en caso contrario.
-	 * Complejidad: O(1).
+	 * Complejidad: O(n). Siendo n la cantidad de vértices.
+	 * Ya que se recorre la lista de sucesores de 'from' y se busca 'to'.
 	 */
 	public boolean areConnected(T from, T to) {
 		// Si alguno de los vértices no existe en el grafo, no están conectados y se
@@ -110,7 +113,7 @@ public class AdjacencyListGraphProj2<T> implements GraphProj2<T> {
 		}
 		// Si el vértice 'to' está en la lista de adyacencia de 'from', están conectados
 		// y se retorna true.
-		if (adjacencyList.get(from).contains(to) && adjacencyList.get(to).contains(from)) {
+		if (adjacencyList.get(from).contains(to)) {
 			return true;
 		}
 		return false;
@@ -120,7 +123,9 @@ public class AdjacencyListGraphProj2<T> implements GraphProj2<T> {
 	 * Recibe un vértice v y retorna la lista de vértices adyacentes a v. Es decir,
 	 * retorna la lista de todos los u ∈ V tales que {v, u} ∈ E.
 	 * Si ocurre algún error, retorna la referencia null.
-	 * Complejidad: O(1).
+	 * Complejidad: O(n), siendo n la cantidad de vertices.
+	 * Esto ya que para copiar la lista, se debe recorrer cada elemento de
+	 * la lista una vez.
 	 */
 	public List<T> getVerticesConnectedTo(T vertex) {
 		// Si el vértice no existe en el grafo, se retorna null.

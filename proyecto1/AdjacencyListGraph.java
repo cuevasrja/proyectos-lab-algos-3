@@ -47,7 +47,9 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 * 'from' y entrante a 'to'.
 	 * Retorna true si el arco es agregado con éxito.
 	 * Retorna false en caso contrario.
-	 * Complejidad: O(1).
+	 * Complejidad: O(n). Siendo n la cantidad de vértices.
+	 * Ya que se debe verificar que el arco no exista en el grafo.
+	 * Y para ello se debe recorrer la lista de sucesores de 'from'.
 	 */
 	public boolean connect(T from, T to) {
 		// Si alguno de los vértices no existe en el grafo, no se agrega el arco y se
@@ -56,7 +58,7 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 			return false;
 		}
 		// Si el arco ya existe en el grafo, no se agrega el arco y se retorna false.
-		if (adjacencyListOut.get(from).contains(to) || adjacencyListIn.get(to).contains(from)) {
+		if (adjacencyListOut.get(from).contains(to)) {
 			return false;
 		}
 		// Se añade el vértice 'to' a la lista de sucesores de 'from'.
@@ -104,28 +106,38 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	 * Recibe un vértice v y retorna la lista de predecedores de v. Es decir,
 	 * retorna la lista de todos los u ∈ V tales que (u, v) ∈ E.
 	 * Si ocurre algún error, retorna la referencia null
-	 * Complejidad: O(1)
+	 * Complejidad: O(n), siendo n la cantidad de vertices.
+	 * Esto ya que para copiar la lista, se debe recorrer cada elemento de
+	 * la lista una vez.
 	 */
 	public List<T> getInwardEdges(T to) {
 		// Si el vértice no existe en el grafo, se retorna null.
 		if (!contains(to)) {
 			return null;
 		}
-		return adjacencyListIn.get(to);
+		// Creamos una lista de predecesores de 'to', para no retornar la referencia
+		// directa a la lista de predecesores de 'to'.
+		List<T> result = new LinkedList<T>(adjacencyListIn.get(to));
+		return result;
 	}
 
 	/*
 	 * Recibe un vértice v y retorna la lista de sucesores de v. Es decir, retorna
 	 * la lista de todos los u ∈ V tales que (v, u) ∈ E.
 	 * Si ocurre algún error, retorna la referencia null.
-	 * Complejidad: O(1).
+	 * Complejidad: O(n), siendo n la cantidad de vertices.
+	 * Esto ya que para copiar la lista, se debe recorrer cada elemento de
+	 * la lista una vez.
 	 */
 	public List<T> getOutwardEdges(T from) {
 		// Si el vértice no existe en el grafo, se retorna null.
 		if (!contains(from)) {
 			return null;
 		}
-		return adjacencyListOut.get(from);
+		// Creamos una lista de sucesores de 'from', para no retornar la referencia
+		// directa a la lista de sucesores de 'from'.
+		List<T> result = new LinkedList<T>(adjacencyListOut.get(from));
+		return result;
 	}
 
 	/*

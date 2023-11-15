@@ -73,17 +73,19 @@ Por eso decimos que nos inspiramos en la técnica de _Backtracking_, ya que no e
 
 Dibujamos una tabla con la complejidad de cada método:
 
-| Método              | Complejidad |
-| ------------------- | ----------- |
-| cargarMazo          | O(\|V\|)    |
-| createDeckGraph     | O(\|V\|)    |
-| conectarCartas      | O(\|V\|^2)  |
-| unaCaractEnComun    | O(1)        |
-| findCombinations    | O(\|V\|^3)  |
-| findCombinationsRec | O(\|V\|^3)  |
-| cartasValidas       | O(1)        |
+| Método              | Complejidad          |
+| ------------------- | -------------------- |
+| cargarMazo          | O(\|V\|)             |
+| createDeckGraph     | O(\|V\|)             |
+| conectarCartas      | O(\|V\|<sup>3</sup>) |
+| unaCaractEnComun    | O(1)                 |
+| findCombinations    | O(\|V\|<sup>3</sup>) |
+| findCombinationsRec | O(\|V\|<sup>3</sup>) |
+| cartasValidas       | O(1)                 |
 
 Donde `|V|` es la cardinalidad del grafo no dirigido del mazo, es decir, la cantidad de cartas mostro en el mazo.
+
+**Nota:** Más detalles sobre la complejidad de cada método se encuentran en los comentarios del código de la clase `MundoChiquito`.
 
 ## Grupo de Laboratorio
 

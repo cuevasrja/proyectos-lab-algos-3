@@ -26,9 +26,13 @@ Como agregado, también implementamos el método _**toString**_ para poder impri
    Sino que se agrega a dos HashMaps, uno donde cada vértice se mapea a una lista de sus predecesores, y otro donde cada vértice se mapea a una lista de sus sucesores.
    Esto es de complejidad O(1) para cada HashMap, por lo que la complejidad total es **O(1)**.
 
-2. Método _**connect**_: En el HashMap de sucesores al vértice _from_ se le mapea el vértice _to_,
+2. Método _**connect**_: Primero se verifica que los vertices pertenezcan al grafo y
+   luego que el arco no exista anteriormente. Para esto se recorre la lista de sucesores
+   de 'from' y si est'a 'to', no se agrega el arco.
+   De resto, en el HashMap de sucesores al vértice _from_ se le mapea el vértice _to_,
    y en el HashMap de predecesores al vértice _to_ se le mapea el vértice _from_.
-   Esto es de complejidad O(1) para cada HashMap, por lo que la complejidad total es **O(1)**.
+   Recorrer la lista de sucesores de 'from' es O(n), por lo que la complejidad total
+   es **O(n)**.
 
 3. Método _**disconnect**_: El HashMap de sucesores, nos regresa la lista de sucesores del vértice _from_,
    y en esa lista buscamos el vértice _to_ y lo removemos. El HashMap de predecesores, nos regresa la lista de
@@ -39,10 +43,14 @@ Como agregado, también implementamos el método _**toString**_ para poder impri
    En particular, nosotros lo buscamos en el HashMap de sucesores, pero se puede buscar en cualquiera de los dos. Ya que al agregar un vértice, se agrega a ambos HashMaps, entonces si está en uno, también está en el otro.
 
 5. Método _**getInwardEdges**_: Acá es donde se ve la ventaja de usar dos HashMaps. En el HashMap de predecesores al vértice _v_
-   se le mapea una lista de sus predecesores, por lo que simplemente se retorna esa lista. Esto es de complejidad **O(1)**.
+   se le mapea una lista de sus predecesores, por lo que simplemente se busca esa lista. Esto es de complejidad O(1).
+   Sin embargo, no podemos retornar esa lista, porque retornaríamos la referencia directamente,
+   por lo que hay que hacer una lista que sea copia de la referencia y eso es complejidad **O(n)**.
 
 6. Método _**getOutwardEdges**_: En el HashMap de sucesores al vértice _v_ se le mapea una lista de sus sucesores,
-   por lo que simplemente se retorna esa lista. Esto es de complejidad O(1).
+   por lo que simplemente se busca esa lista. Esto es de complejidad O(1).
+   Sin embargo, no podemos retornar esa lista, porque retornaríamos la referencia directamente,
+   por lo que hay que hacer una lista que sea copia de la referencia y eso es complejidad **O(n)**.
 
 7. Método _**getVerticesConnectedTo**_: Se crea una lista, y se recorre la lista de sucesores y la lista
    de predecesores del vértice _v_, y se agregan a la lista creada todos los vértices que de estas listas.
@@ -79,11 +87,11 @@ Dibujamos una tabla con la complejidad de cada método:
 | Método                 | Complejidad |
 | ---------------------- | ----------- |
 | add                    | O(1)        |
-| connect                | O(1)        |
+| connect                | O(n)        |
 | disconnect             | O(n)        |
 | contains               | O(1)        |
-| getInwardEdges         | O(1)        |
-| getOutwardEdges        | O(1)        |
+| getInwardEdges         | O(n)        |
+| getOutwardEdges        | O(n)        |
 | getVerticesConnectedTo | O(n)        |
 | getAllVertices         | O(1)        |
 | remove                 | O(m\*n)     |
