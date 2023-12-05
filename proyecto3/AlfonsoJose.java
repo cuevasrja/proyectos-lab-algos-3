@@ -7,12 +7,7 @@ public class AlfonsoJose {
         String archivo = "atlantis.txt";
         int[][] matriz = leerArchivo(archivo);
         System.out.println("Matriz original:");
-        for (int i = 0; i < matriz.length; i++){
-            for (int j = 0; j < matriz[i].length; j++){
-                System.out.print(matriz[i][j] + " ");
-            }
-            System.out.println();
-        }
+        imprimirMatriz(matriz);
 
         int filas = matriz.length;
         int columnas = matriz[0].length;
@@ -23,23 +18,49 @@ public class AlfonsoJose {
         int max = floydWarshall(matriz, estados, filas, columnas);
 
         System.out.println("Matriz final:");
+        imprimirMatriz(matriz);
+
+        System.out.println("Matriz de estados:");
+        imprimirEstados(estados);
+
+        System.out.println("Se pueden colocar " + max + " bloques de agua");
+    }
+
+    /**
+     * Imprime la matriz
+     * Complejidad: O(|V|) donde |V| es la cantidad de vertices del grafo
+     * @param matriz
+     */
+    public static void imprimirMatriz(int[][] matriz) {
         for (int i = 0; i < matriz.length; i++){
             for (int j = 0; j < matriz[i].length; j++){
                 System.out.print(matriz[i][j] + " ");
             }
             System.out.println();
         }
+    }
 
-        System.out.println("Matriz de estados:");
+    /**
+     * Imprime la matriz de estados
+     * Complejidad: O(|V|) donde |V| es la cantidad de vertices del grafo
+     * @param estados
+     */
+    public static void imprimirEstados(Estados[][] estados) {
         for (int i = 0; i < estados.length; i++){
             for (int j = 0; j < estados[i].length; j++){
                 System.out.println(i + ", " + j + ": " +estados[i][j].toString());
             }
         }
-
-        System.out.println("Se pueden colocar " + max + " bloques de agua");
     }
 
+    /**
+     * Revisa si la posicion actual es un borde
+     * @param i
+     * @param j
+     * @param filas
+     * @param columnas
+     * @return true si es borde, false si no
+     */
     public static Boolean esBorde(int i, int j, int filas, int columnas) {
         return (i == 0 || i == filas - 1 || j == 0 || j == columnas - 1);
     }
@@ -95,12 +116,16 @@ public class AlfonsoJose {
      * @return estados
     */
     public static Estados[][] matrizEstados(int filas, int columnas) {
+        // Creamos la matriz de estados con los valores inicializados
         Estados[][] estados = new Estados[filas][columnas];
+        // Llenamos la matriz de estados con los valores inicializados
         for (int i = 0; i < estados.length; i++){
             for (int j = 0; j < estados[i].length; j++){
+                // Si es borde, el estado es VACIO
                 if (esBorde(i, j, filas, columnas)) {
                     estados[i][j] = new Estados(Estado.VACIO);
                 }
+                // Si no es borde, el estado es DESCONOCIDO
                 else{
                     estados[i][j] = new Estados(Estado.DESCONOCIDO);
                 }
@@ -110,6 +135,7 @@ public class AlfonsoJose {
     }
 
     /**
+     * Coloca bloques de agua en la posicion actual y en las posiciones adyacentes si es posible
      * Complejidad: O(?)
      * @param matriz
      * @param estados
@@ -124,15 +150,22 @@ public class AlfonsoJose {
             int abajo = matriz[i + 1][j];
             int izquierda = matriz[i][j - 1];
             int derecha = matriz[i][j + 1];
+            // Si se puede colocar el bloque de agua en la posicion actual, se coloca
             if (arriba > matriz[i][j] && abajo > matriz[i][j] && izquierda > matriz[i][j] && derecha > matriz[i][j]) {
+                // Tomamos la altura minima de los adyacentes
                 int hMin = Math.min(Math.min(arriba, abajo), Math.min(izquierda, derecha));
+                // Cambiamos el estado de la posicion actual a LLENO
                 estados[i][j].setStatus(Estado.LLENO);
                 estados[i][j].setFillable(true);
+                // Calculamos la diferencia de altura entre la posicion actual y la altura minima de los adyacentes
                 estados[i][j].setH(hMin - matriz[i][j]);
                 matriz[i][j] = hMin;
+                // Sumamos la diferencia de altura a la cantidad de bloques de agua que se pueden colocar
                 mutableInt[0] += estados[i][j].getH();
             }
             else {
+                // ! Este caso no funciona bien
+                // TODO: Revisar este caso
                 estados[i][j].setStatus(Estado.VACIO);
                 int hMin = Math.min(Math.min(arriba, abajo), Math.min(izquierda, derecha));
                 int minI;
@@ -207,12 +240,15 @@ public class AlfonsoJose {
      * @return max (la cantidad maxima de bloques de agua que se pueden colocar)
     */
     public static int floydWarshall(int[][] matriz, Estados[][] estados, int filas, int columnas) {
+        // Inicializamos la matriz de distancias
         int[] mutableInt = new int[1];
         mutableInt[0] = 0;
 
+        // Recorremos la matriz
         for (int i = 1; i < filas - 1; i++){
             for (int j = 1; j < columnas - 1; j++){
-                if (estados[i][j].getStatus() == Estado.DESCONOCIDO) {
+                // Si la posicion actual es un borde, no se puede colocar un bloque de agua
+                if (estados[i][j].getStatus() != Estado.VACIO) {
                     fill(matriz, estados, i, j, mutableInt);
                 }
             }
