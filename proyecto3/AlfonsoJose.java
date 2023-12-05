@@ -155,25 +155,37 @@ public class AlfonsoJose {
                 }
                 if (estados[minI][minJ].getStatus() == Estado.DESCONOCIDO) {
                     fill(matriz, estados, minI, minJ, mutableInt);
+                    fill(matriz, estados, i, j, mutableInt);
                 }
                 else if (estados[minI][minJ].getStatus() == Estado.LLENO) {
                     // Revisamos si se pueden llenar los adyacentes
-                    int arriba2 = minI - 1 == i ? Integer.MAX_VALUE : matriz[minI - 1][minJ];
-                    int abajo2 = minI + 1 == i ? Integer.MAX_VALUE : matriz[minI + 1][minJ];
-                    int izquierda2 = minJ - 1 == j ? Integer.MAX_VALUE : matriz[minI][minJ - 1];
-                    int derecha2 = minJ + 1 == j ? Integer.MAX_VALUE : matriz[minI][minJ + 1];
+                    int arriba2 = (minI - 1 == i && minJ == j) ? Integer.MAX_VALUE : matriz[minI - 1][minJ];
+                    int abajo2 = (minI + 1 == i && minJ == j) ? Integer.MAX_VALUE : matriz[minI + 1][minJ];
+                    int izquierda2 = (minJ - 1 == j && minI == i) ? Integer.MAX_VALUE : matriz[minI][minJ - 1];
+                    int derecha2 = (minJ + 1 == j && minI == i) ? Integer.MAX_VALUE : matriz[minI][minJ + 1];
+                    arriba = (i-1 == minI && j == minJ) ? Integer.MAX_VALUE : matriz[i - 1][j];
+                    abajo = (i+1 == minI && j == minJ) ? Integer.MAX_VALUE : matriz[i + 1][j];
+                    izquierda = (j-1 == minJ && i == minI) ? Integer.MAX_VALUE : matriz[i][j - 1];
+                    derecha = (j+1 == minJ && i == minI) ? Integer.MAX_VALUE : matriz[i][j + 1];
                     // Si se pueden llenar los adyacentes, se llena la posicion actual
                     // Omitimos la posicion actual porque ya sabemos que se puede llenar
-                    if (arriba2 > matriz[minI][minJ] && abajo2 > matriz[minI][minJ] && izquierda2 > matriz[minI][minJ] && derecha2 > matriz[minI][minJ]) {
-                        int hMin2 = Math.min(Math.min(arriba2, abajo2), Math.min(izquierda2, derecha2));
+                    if (arriba2 > matriz[minI][minJ] && abajo2 > matriz[minI][minJ] && izquierda2 > matriz[minI][minJ] && derecha2 > matriz[minI][minJ] && arriba > matriz[i][j] && abajo > matriz[i][j] && izquierda > matriz[i][j] && derecha > matriz[i][j]) {
+                        int hMin2 = Math.min(Math.min(Math.min(arriba2, abajo2), Math.min(izquierda2, derecha2)), Math.min(Math.min(arriba, abajo), Math.min(izquierda, derecha)));
                         estados[i][j].setFillable(true);
                         estados[i][j].setH(hMin2 - matriz[i][j]);
+                        estados[i][j].setStatus(Estado.LLENO);
                         matriz[i][j] = hMin2;
                         mutableInt[0] += estados[i][j].getH();
+                        estados[minI][minJ].setFillable(true);
+                        int diferencia = hMin2 - matriz[minI][minJ];
+                        estados[minI][minJ].setH(estados[minI][minJ].getH() + diferencia);
+                        matriz[minI][minJ] = hMin2;
+                        mutableInt[0] += diferencia;
                     }
                     else {
                         estados[i][j].setFillable(false);
                         estados[i][j].setH(estados[minI][minJ].getH());
+                        estados[i][j].setStatus(Estado.VACIO);
                     }
                 }
                 else {
