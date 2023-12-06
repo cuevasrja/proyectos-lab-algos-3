@@ -23,9 +23,11 @@ public class AlfonsoJose {
         // Construimos el grafo reducido a partir del grafo y las componentes fuertemente conexas
         Graph<Integer> grafoReducido = reducirGrafo(grafo, CFC);
 
+        int[] mutableInt = {0};
         // Calculamos la cantidad de cubos máximos de agua que se pueden usar para inundar Atlantis
-        int cubosMaximos = cubosMaximos(matriz, grafoReducido);
-        
+        cubosMaximos(matriz, grafoReducido, CFC, mutableInt);
+
+        int cubosMaximos = mutableInt[0];
         // Imprimimos la cantidad de cubos máximos de agua que se pueden usar para inundar Atlantis
         System.out.println("Cantidad de cubos máximos de agua que se pueden usar para inundar Atlantis: " + cubosMaximos);
         
@@ -299,29 +301,29 @@ public class AlfonsoJose {
      * @param grafoReducido grafo reducido a componentes fuertemente conexas
      * @return cantidad de cubos máximos de agua que se pueden usar para inundar Atlantis
      */
-    public static int cubosMaximos(int[][] matriz, Graph<Integer> grafoReducido){
-        int cubosMaximos = 0;
+    public static void cubosMaximos(int[][] matriz, Graph<Integer> grafoReducido, List<Set<Vertex<Integer>>> CFC, int[] mutableInt){
         Graph<Integer> graphAux = grafoReducido;
 
-        // TODO: Implementar algoritmo de cubos máximos
-        // ! No se si es correcto
-        while (graphAux.getAllVertices().size() > 0) {
-            int min = Integer.MAX_VALUE;
-            Vertex<Integer> minVertex = null;
-            for (Vertex<Integer> vertex : graphAux.getAllVertices()) {
-                if (vertex.getCost() < min) {
-                    min = vertex.getCost();
-                    minVertex = vertex;
-                }
-            }
-            if (!esBorde(minVertex, matriz)) {
-                System.out.println("Se puede usar un cubo de agua en el bloque " + minVertex.getId() + " con altura " + minVertex.getCost());
-                cubosMaximos += min;
-            }
-            graphAux.remove(minVertex);
-        }
+        List<Vertex<Integer>> fuentes = getFuentes(graphAux);
+        List<Vertex<Integer>> sumideros = getSumideros(graphAux);
+        
+        // Imprimimos las componentes fuertemente conexas
+        imprimirCC(CFC);
 
-        return cubosMaximos;
+        // Imprimimos las fuentes
+        System.out.println("Fuentes: " + fuentes);
+
+        // Imprimimos los sumideros
+        System.out.println("Sumideros: " + sumideros);
+
+        // Imprimimos el grafo reducido
+        System.out.println("Grafo reducido: ");
+        System.out.println(graphAux);
+
+        // Imprimimos la matriz
+        imprimirMatriz(matriz);
+        
+        // TODO: Calcular la cantidad de cubos máximos de agua que se pueden usar para inundar Atlantis
     }
 
     /**
@@ -342,4 +344,70 @@ public class AlfonsoJose {
         return false;
     }
 
+    /**
+     * Retorna una lista de vértices sumideros
+     * Complejidad: O(|V|*|E|) donde |V| es la cantidad de vértices y |E| es la cantidad de arcos
+     * @param graph grafo dirigido
+     * @return lista de vértices sumideros
+     */
+    private static List<Vertex<Integer>> getSumideros(Graph<Integer> graph) {
+        List<Vertex<Integer>> sumideros = new ArrayList<>();
+        for (Vertex<Integer> vertex : graph.getAllVertices()) {
+            if (graph.getOutDegree(vertex) == 0 && graph.getInDegree(vertex) > 0) {
+                sumideros.add(vertex);
+            }
+        }
+        return sumideros;
+    }
+
+    /**
+     * Retorna una lista de vértices fuentes
+     * Complejidad: O(|V|*|E|) donde |V| es la cantidad de vértices y |E| es la cantidad de arcos
+     * @param graph grafo dirigido
+     * @return lista de vértices fuentes
+     */
+    private static List<Vertex<Integer>> getFuentes(Graph<Integer> graph) {
+        List<Vertex<Integer>> fuentes = new ArrayList<>();
+        for (Vertex<Integer> vertex : graph.getAllVertices()) {
+            if (graph.getInDegree(vertex) == 0 && graph.getOutDegree(vertex) > 0) {
+                fuentes.add(vertex);
+            }
+        }
+        return fuentes;
+    }
+
+    /**
+     * Retorna el predecesor con menor costo de un vértice
+     * Complejidad: O(|E|) donde |E| es la cantidad de arcos
+     * @param vertex vértice
+     * @param graph grafo dirigido
+     * @return predecesor con menor costo
+     */
+    private static Vertex<Integer> predecesorMin(Vertex<Integer> vertex, Graph<Integer> graph) {
+        Vertex<Integer> predecesorMin = null;
+        int costoMin = Integer.MAX_VALUE;
+        for (Vertex<Integer> predecesor : graph.getInwardEdges(vertex)) {
+            if (predecesor.getCost() < costoMin) {
+                predecesorMin = predecesor;
+                costoMin = predecesor.getCost();
+            }
+        }
+        return predecesorMin;
+    }
+
+    /**
+     * Retorna el tamaño de la componente fuertemente conexa a la que pertenece un vértice
+     * Complejidad: O(|CC|) donde |CC| es la cantidad de componentes fuertemente conexas
+     * @param vertex vértice
+     * @param CFC lista de conjuntos de vértices. Cada conjunto representa una componente fuertemente conexa
+     * @return tamaño de la componente fuertemente conexa a la que pertenece un vértice
+     */
+    private static int getSizeCFC(Vertex<Integer> vertex, List<Set<Vertex<Integer>>> CFC) {
+        for (Set<Vertex<Integer>> componente : CFC) {
+            if (componente.contains(vertex)) {
+                return componente.size();
+            }
+        }
+        return 0;
+    }
 }
