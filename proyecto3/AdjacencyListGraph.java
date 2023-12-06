@@ -135,6 +135,34 @@ public class AdjacencyListGraph<T> implements Graph<T> {
 	}
 
 	/*
+	 * Recibe un vértice v y retorna el grado de entrada de v. Es decir, retorna el
+	 * número de arcos entrantes de v.
+	 * Si ocurre algún error, retorna -1.
+	 * Complejidad: O(1).
+	 */
+	public int getInDegree(Vertex<T> vertex) {
+		// Si el vértice no existe en el grafo, se retorna -1.
+		if (!contains(vertex)) {
+			return -1;
+		}
+		return adjacencyListIn.get(vertex).size();
+	}
+
+	/*
+	 * Recibe un vértice v y retorna el grado de entrada de v. Es decir, retorna el
+	 * número de arcos salientes de v.
+	 * Si ocurre algún error, retorna -1.
+	 * Complejidad: O(1).
+	 */
+	public int getOutDegree(Vertex<T> vertex) {
+		// Si el vértice no existe en el grafo, se retorna -1.
+		if (!contains(vertex)) {
+			return -1;
+		}
+		return adjacencyListOut.get(vertex).size();
+	}
+
+	/*
 	 * Recibe un vértice v y retorna la lista de vértices adyacentes a v. Es decir,
 	 * retorna la lista de todos los u ∈ V tales que (v, u) ∈ E o (u, v) ∈ E.
 	 * Si ocurre algún error, retorna la referencia null.

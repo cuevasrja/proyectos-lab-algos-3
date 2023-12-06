@@ -7,6 +7,8 @@ interface Graph<T> {
     boolean contains(Vertex<T> vertex);
     List<Vertex<T>> getInwardEdges(Vertex<T> to);
     List<Vertex<T>> getOutwardEdges(Vertex<T> from);
+    int getInDegree(Vertex<T> vertex);
+    int getOutDegree(Vertex<T> vertex);
     List<Vertex<T>> getVerticesConnectedTo(Vertex<T> vertex);
     List<Vertex<T>> getAllVertices();
     boolean remove(Vertex<T> vertex);

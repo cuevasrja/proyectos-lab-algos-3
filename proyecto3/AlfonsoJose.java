@@ -11,18 +11,23 @@ import java.util.Stack;
 public class AlfonsoJose {
     public static void main(String[] args) {
         String archivo = "atlantis.txt";
-        Graph<Integer> grafo = leerArchivo(archivo);
-        System.out.println("Grafo:");
-        System.out.println(grafo);
+        // Leemos el archivo y obtenemos la matriz
+        int[][] matriz = leerArchivo(archivo);
 
+        // Construimos el grafo a partir de la matriz
+        Graph<Integer> grafo = construitGrafo(matriz);
+
+        // Calculamos las componentes fuertemente conexas del grafo
         List<Set<Vertex<Integer>>> CFC = componentesFuertementeConexas(grafo);
-        System.out.println("Componentes fuertemente conexas:");
-        imprimirCC(CFC);
 
+        // Construimos el grafo reducido a partir del grafo y las componentes fuertemente conexas
         Graph<Integer> grafoReducido = reducirGrafo(grafo, CFC);
-        System.out.println("Grafo reducido:");
-        System.out.println(grafoReducido);
 
+        // Calculamos la cantidad de cubos máximos de agua que se pueden usar para inundar Atlantis
+        int cubosMaximos = cubosMaximos(matriz, grafoReducido);
+        
+        // Imprimimos la cantidad de cubos máximos de agua que se pueden usar para inundar Atlantis
+        System.out.println("Cantidad de cubos máximos de agua que se pueden usar para inundar Atlantis: " + cubosMaximos);
         
     }
 
@@ -55,15 +60,28 @@ public class AlfonsoJose {
         System.out.println("");
     }
 
+    public static void imprimirMatriz(int[][] matriz){
+        for (int i = 0; i < matriz.length; i++) {
+            System.out.print("[");
+            for (int j = 0; j < matriz[0].length; j++) {
+                System.out.print(matriz[i][j]);
+                if (j != matriz[0].length-1) {
+                    System.out.print(", ");
+                }
+            }
+            System.out.println("]");
+        }
+        System.out.println("");
+    }
+
     /**
      * Lee el archivo y devuelve un grafo con los datos del archivo.
      * Complejidad: O(|V|) donde |V| es la cantidad de vertices del grafo
      * @param path
      * @return matriz
     */
-    public static Graph<Integer> leerArchivo(String path) {
+    public static int[][] leerArchivo(String path) {
         int[][] matriz = null;
-        Graph<Integer> grafo = new AdjacencyListGraph<>();
         try {
             File archivo = new File(path);
             Scanner sc = new Scanner(archivo);
@@ -83,22 +101,32 @@ public class AlfonsoJose {
             int columnas = valores.length;
             matriz = new int[filas][columnas];
             // Llenamos la matriz con los datos del archivo
-            int vertex = 0;
             int i = 0;
             while (sc.hasNextLine()) {
                 linea = sc.nextLine();
                 valores = linea.split(" ");
                 for (int j = 0; j < valores.length; j++) {
                     matriz[i][j] = Integer.parseInt(valores[j]);
-                    Vertex<Integer> v = new Vertex<Integer>(vertex, matriz[i][j]);
-                    grafo.add(v);
-                    vertex++;
                 }
                 i++;
             }
             sc.close();
         } catch (FileNotFoundException e) {
             System.out.println("No se encontro el archivo");
+        }
+        return matriz;
+    }
+
+    public static Graph<Integer> construitGrafo(int[][] matriz){
+        Graph<Integer> grafo = new AdjacencyListGraph<>();
+        // Llenamos la matriz con los datos del archivo
+        int vertex = 0;
+        for (int i = 0; i < matriz.length; i++) {
+            for (int j = 0; j < matriz[0].length; j++) {
+                Vertex<Integer> v = new Vertex<Integer>(vertex, matriz[i][j]);
+                grafo.add(v);
+                vertex++;
+            }
         }
         // Recorremos la matriz y agregamos los arcos al grafo.
         // Los arcos se agregan de la siguiente manera:
@@ -263,4 +291,55 @@ public class AlfonsoJose {
         }
         return false;
     }
+
+    /**
+     * Calcula la cantidad de cubos máximos de agua que se pueden usar para inundar Atlantis
+     * Complejidad: O(?)
+     * @param matriz matriz de costos (Altura de cada bloque)
+     * @param grafoReducido grafo reducido a componentes fuertemente conexas
+     * @return cantidad de cubos máximos de agua que se pueden usar para inundar Atlantis
+     */
+    public static int cubosMaximos(int[][] matriz, Graph<Integer> grafoReducido){
+        int cubosMaximos = 0;
+        Graph<Integer> graphAux = grafoReducido;
+
+        // TODO: Implementar algoritmo de cubos máximos
+        // ! No se si es correcto
+        while (graphAux.getAllVertices().size() > 0) {
+            int min = Integer.MAX_VALUE;
+            Vertex<Integer> minVertex = null;
+            for (Vertex<Integer> vertex : graphAux.getAllVertices()) {
+                if (vertex.getCost() < min) {
+                    min = vertex.getCost();
+                    minVertex = vertex;
+                }
+            }
+            if (!esBorde(minVertex, matriz)) {
+                System.out.println("Se puede usar un cubo de agua en el bloque " + minVertex.getId() + " con altura " + minVertex.getCost());
+                cubosMaximos += min;
+            }
+            graphAux.remove(minVertex);
+        }
+
+        return cubosMaximos;
+    }
+
+    /**
+     * Retorna true si un vértice es borde
+     * Complejidad: O(1)
+     * @param vertex vértice
+     * @param matriz matriz de costos (Altura de cada bloque)
+     * @return true si el vértice es borde
+     */
+    private static boolean esBorde(Vertex<Integer> vertex, int[][] matriz) {
+        int i = vertex.getId()/matriz[0].length;
+        int j = vertex.getId()%matriz[0].length;
+        System.out.println("i: " + i + " j: " + j);
+        System.out.println("v: " + vertex);
+        if (i == 0 || i == matriz.length-1 || j == 0 || j == matriz[0].length-1) {
+            return true;
+        }
+        return false;
+    }
+
 }
