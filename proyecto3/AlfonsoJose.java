@@ -1,78 +1,69 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.Stack;
 
 public class AlfonsoJose {
     public static void main(String[] args) {
         String archivo = "atlantis.txt";
-        int[][] matriz = leerArchivo(archivo);
-        System.out.println("Matriz original:");
-        imprimirMatriz(matriz);
+        Graph<Integer> grafo = leerArchivo(archivo);
+        System.out.println("Grafo:");
+        System.out.println(grafo);
 
-        int filas = matriz.length;
-        int columnas = matriz[0].length;
-        // Creamos la matriz de estados con los valores inicializados
-        Estados[][] estados = matrizEstados(filas, columnas);
+        List<Set<Vertex<Integer>>> CFC = componentesFuertementeConexas(grafo);
+        System.out.println("Componentes fuertemente conexas:");
+        imprimirCC(CFC);
 
-        // Ejecutamos Floyd-Warshall para saber donde se pueden colocar bloques de agua sin que se inunde la ciudad
-        int max = floydWarshall(matriz, estados, filas, columnas);
+        Graph<Integer> grafoReducido = reducirGrafo(grafo, CFC);
+        System.out.println("Grafo reducido:");
+        System.out.println(grafoReducido);
 
-        System.out.println("Matriz final:");
-        imprimirMatriz(matriz);
-
-        System.out.println("Matriz de estados:");
-        imprimirEstados(estados);
-
-        System.out.println("Se pueden colocar " + max + " bloques de agua");
+        
     }
 
     /**
-     * Imprime la matriz
-     * Complejidad: O(|V|) donde |V| es la cantidad de vertices del grafo
-     * @param matriz
+     * Retorna un string con el texto coloreado
+     * Complejidad: O(1)
+     * @param color Numero del color
+     * @param i Numero del componente
+     * @return String con el texto coloreado
      */
-    public static void imprimirMatriz(int[][] matriz) {
-        for (int i = 0; i < matriz.length; i++){
-            for (int j = 0; j < matriz[i].length; j++){
-                System.out.print(matriz[i][j] + " ");
-            }
-            System.out.println();
+    public static String colorear(int color, int i){
+        return "\u001B[" + color + "m" + "Componente " + i + "\u001B[0m";
+    }
+
+    /**
+     * Imprime las componentes fuertemente conexas
+     * Complejidad: O(|CC|) donde |CC| es la cantidad de componentes fuertemente conexas
+     * @param componentes lista de conjuntos de vértices. Cada conjunto representa una componente fuertemente conexa
+    */
+    public static void imprimirCC(List<Set<Vertex<Integer>>> componentes){
+        int i = 1;
+        int color = 91;
+        // Recorremos las componentes fuertemente conexas
+        for (Set<Vertex<Integer>> componente : componentes) {
+            if (color > 96) color = 91;
+            System.out.println(colorear(color, i) + ": " + componente);
+            i++;
+            color++;
         }
+        System.out.println("");
     }
 
     /**
-     * Imprime la matriz de estados
-     * Complejidad: O(|V|) donde |V| es la cantidad de vertices del grafo
-     * @param estados
-     */
-    public static void imprimirEstados(Estados[][] estados) {
-        for (int i = 0; i < estados.length; i++){
-            for (int j = 0; j < estados[i].length; j++){
-                System.out.println(i + ", " + j + ": " +estados[i][j].toString());
-            }
-        }
-    }
-
-    /**
-     * Revisa si la posicion actual es un borde
-     * @param i
-     * @param j
-     * @param filas
-     * @param columnas
-     * @return true si es borde, false si no
-     */
-    public static Boolean esBorde(int i, int j, int filas, int columnas) {
-        return (i == 0 || i == filas - 1 || j == 0 || j == columnas - 1);
-    }
-
-    /**
-     * Lee el archivo y devuelve la matriz de enteros con los datos (n*m)
+     * Lee el archivo y devuelve un grafo con los datos del archivo.
      * Complejidad: O(|V|) donde |V| es la cantidad de vertices del grafo
      * @param path
      * @return matriz
     */
-    public static int[][] leerArchivo(String path) {
+    public static Graph<Integer> leerArchivo(String path) {
         int[][] matriz = null;
+        Graph<Integer> grafo = new AdjacencyListGraph<>();
         try {
             File archivo = new File(path);
             Scanner sc = new Scanner(archivo);
@@ -92,12 +83,16 @@ public class AlfonsoJose {
             int columnas = valores.length;
             matriz = new int[filas][columnas];
             // Llenamos la matriz con los datos del archivo
+            int vertex = 0;
             int i = 0;
             while (sc.hasNextLine()) {
                 linea = sc.nextLine();
                 valores = linea.split(" ");
                 for (int j = 0; j < valores.length; j++) {
                     matriz[i][j] = Integer.parseInt(valores[j]);
+                    Vertex<Integer> v = new Vertex<Integer>(vertex, matriz[i][j]);
+                    grafo.add(v);
+                    vertex++;
                 }
                 i++;
             }
@@ -105,155 +100,167 @@ public class AlfonsoJose {
         } catch (FileNotFoundException e) {
             System.out.println("No se encontro el archivo");
         }
-        return matriz;
-    }
-
-    /**
-     * Crea la matriz de estados
-     * Complejidad: O(|V|) donde |V| es la cantidad de vertices del grafo
-     * @param filas
-     * @param columnas
-     * @return estados
-    */
-    public static Estados[][] matrizEstados(int filas, int columnas) {
-        // Creamos la matriz de estados con los valores inicializados
-        Estados[][] estados = new Estados[filas][columnas];
-        // Llenamos la matriz de estados con los valores inicializados
-        for (int i = 0; i < estados.length; i++){
-            for (int j = 0; j < estados[i].length; j++){
-                // Si es borde, el estado es VACIO
-                if (esBorde(i, j, filas, columnas)) {
-                    estados[i][j] = new Estados(Estado.VACIO);
-                }
-                // Si no es borde, el estado es DESCONOCIDO
-                else{
-                    estados[i][j] = new Estados(Estado.DESCONOCIDO);
+        // Recorremos la matriz y agregamos los arcos al grafo.
+        // Los arcos se agregan de la siguiente manera:
+        // Sean u y v dos vertices adyacentes, entonces se agrega un arco de u a v si costo(u) >= costo(v). El costo de cada vertice es el valor de la matriz en esa posicion.
+        for (Vertex<Integer> u : grafo.getAllVertices()) {
+            for (Vertex<Integer> v : grafo.getAllVertices()) {
+                int uI = u.getId()/matriz[0].length;
+                int uJ = u.getId()%matriz[0].length;
+                int vI = v.getId()/matriz[0].length;
+                int vJ = v.getId()%matriz[0].length;
+                if (Math.abs(uI-vI) + Math.abs(uJ-vJ) == 1 && u.getCost() >= v.getCost()) {
+                    grafo.connect(u, v);
                 }
             }
         }
-        return estados;
+        return grafo;
     }
 
     /**
-     * Coloca bloques de agua en la posicion actual y en las posiciones adyacentes si es posible
-     * Complejidad: O(?)
-     * @param matriz
-     * @param estados
-     * @param i
-     * @param j
-     * @param mutableInt
+     * Retorna una lista de conjuntos de vértices que representan las componentes fuertemente conexas del grafo
+     * Complejidad: O(|V|*|E|) donde |V| es la cantidad de vértices y |E| es la cantidad de arcos
+     * @param graph grafo dirigido
+     * @return lista de conjuntos de vértices. Cada conjunto representa una componente fuertemente conexa
     */
-    public static void fill(int[][] matriz, Estados[][] estados, int i, int j, int[] mutableInt) {
-        if (!esBorde(i, j, matriz.length, matriz[0].length)){
-            // Revisamos si el bloque de agua se puede colocar en la posicion actual (Si los adyacentes son mas altos o si se puede color agua en ellos)
-            int arriba = matriz[i - 1][j];
-            int abajo = matriz[i + 1][j];
-            int izquierda = matriz[i][j - 1];
-            int derecha = matriz[i][j + 1];
-            // Si se puede colocar el bloque de agua en la posicion actual, se coloca
-            if (arriba > matriz[i][j] && abajo > matriz[i][j] && izquierda > matriz[i][j] && derecha > matriz[i][j]) {
-                // Tomamos la altura minima de los adyacentes
-                int hMin = Math.min(Math.min(arriba, abajo), Math.min(izquierda, derecha));
-                // Cambiamos el estado de la posicion actual a LLENO
-                estados[i][j].setStatus(Estado.LLENO);
-                estados[i][j].setFillable(true);
-                // Calculamos la diferencia de altura entre la posicion actual y la altura minima de los adyacentes
-                estados[i][j].setH(hMin - matriz[i][j]);
-                matriz[i][j] = hMin;
-                // Sumamos la diferencia de altura a la cantidad de bloques de agua que se pueden colocar
-                mutableInt[0] += estados[i][j].getH();
-            }
-            else {
-                // ! Este caso no funciona bien
-                // TODO: Revisar este caso
-                estados[i][j].setStatus(Estado.VACIO);
-                int hMin = Math.min(Math.min(arriba, abajo), Math.min(izquierda, derecha));
-                int minI;
-                int minJ;
-                if (hMin == arriba) {
-                    minI = i - 1;
-                    minJ = j;
-                }
-                else if (hMin == abajo) {
-                    minI = i + 1;
-                    minJ = j;
-                }
-                else if (hMin == izquierda) {
-                    minI = i;
-                    minJ = j - 1;
-                }
-                else {
-                    minI = i;
-                    minJ = j + 1;
-                }
-                if (estados[minI][minJ].getStatus() == Estado.DESCONOCIDO) {
-                    fill(matriz, estados, minI, minJ, mutableInt);
-                    fill(matriz, estados, i, j, mutableInt);
-                }
-                else if (estados[minI][minJ].getStatus() == Estado.LLENO) {
-                    // Revisamos si se pueden llenar los adyacentes
-                    int arriba2 = (minI - 1 == i && minJ == j) ? Integer.MAX_VALUE : matriz[minI - 1][minJ];
-                    int abajo2 = (minI + 1 == i && minJ == j) ? Integer.MAX_VALUE : matriz[minI + 1][minJ];
-                    int izquierda2 = (minJ - 1 == j && minI == i) ? Integer.MAX_VALUE : matriz[minI][minJ - 1];
-                    int derecha2 = (minJ + 1 == j && minI == i) ? Integer.MAX_VALUE : matriz[minI][minJ + 1];
-                    arriba = (i-1 == minI && j == minJ) ? Integer.MAX_VALUE : matriz[i - 1][j];
-                    abajo = (i+1 == minI && j == minJ) ? Integer.MAX_VALUE : matriz[i + 1][j];
-                    izquierda = (j-1 == minJ && i == minI) ? Integer.MAX_VALUE : matriz[i][j - 1];
-                    derecha = (j+1 == minJ && i == minI) ? Integer.MAX_VALUE : matriz[i][j + 1];
-                    // Si se pueden llenar los adyacentes, se llena la posicion actual
-                    // Omitimos la posicion actual porque ya sabemos que se puede llenar
-                    if (arriba2 > matriz[minI][minJ] && abajo2 > matriz[minI][minJ] && izquierda2 > matriz[minI][minJ] && derecha2 > matriz[minI][minJ] && arriba > matriz[i][j] && abajo > matriz[i][j] && izquierda > matriz[i][j] && derecha > matriz[i][j]) {
-                        int hMin2 = Math.min(Math.min(Math.min(arriba2, abajo2), Math.min(izquierda2, derecha2)), Math.min(Math.min(arriba, abajo), Math.min(izquierda, derecha)));
-                        estados[i][j].setFillable(true);
-                        estados[i][j].setH(hMin2 - matriz[i][j]);
-                        estados[i][j].setStatus(Estado.LLENO);
-                        matriz[i][j] = hMin2;
-                        mutableInt[0] += estados[i][j].getH();
-                        estados[minI][minJ].setFillable(true);
-                        int diferencia = hMin2 - matriz[minI][minJ];
-                        estados[minI][minJ].setH(estados[minI][minJ].getH() + diferencia);
-                        matriz[minI][minJ] = hMin2;
-                        mutableInt[0] += diferencia;
-                    }
-                    else {
-                        estados[i][j].setFillable(false);
-                        estados[i][j].setH(estados[minI][minJ].getH());
-                        estados[i][j].setStatus(Estado.VACIO);
-                    }
-                }
-                else {
-                    estados[i][j].setFillable(false);
-                    estados[i][j].setH(estados[minI][minJ].getH());
-                }
+    public static List<Set<Vertex<Integer>>> componentesFuertementeConexas(Graph<Integer> graph){
+        // Inicialiamos nuestra pila de caminos cerrados y nuestro conjunto de vértices visitados
+        Stack<Vertex<Integer>> stack = new Stack<>();
+        Set<Vertex<Integer>> visited = new HashSet<>();
+
+        // Realizamos DFS en el grafo original
+        for (Vertex<Integer> vertex : graph.getAllVertices()) {
+            // Si el vértice no ha sido visitado, hacemos DFS
+            if (!visited.contains(vertex)) {
+                dfs(graph, vertex, visited, stack);
             }
         }
+
+        // Creamos el grafo transpuesto
+        Graph<Integer> transposedGraph = simetrico(graph);
+
+        // Reiniciamos nuestro conjunto de vértices visitados
+        visited.clear();
+        // Creamos una lista de conjuntos de vértices que representan las componentes fuertemente conexas
+        List<Set<Vertex<Integer>>> CFC = new ArrayList<>();
+
+        // Realizamos DFS en el grafo transpuesto en el orden de finalización de los vértices
+        while (!stack.isEmpty()) {
+            Vertex<Integer> vertex = stack.pop();
+            // Si el vértice no ha sido visitado, hacemos DFS
+            if (!visited.contains(vertex)) {
+                // Creamos un conjunto de vértices que representan una componente fuertemente conexa
+                Set<Vertex<Integer>> componente = new HashSet<>();
+                dfs(transposedGraph, vertex, visited, componente);
+                // Agregamos la componente fuertemente conexa a la lista de componentes
+                CFC.add(componente);
+            }
+        }
+
+        return CFC;
     }
 
+    /**
+     * DFS en un grafo dirigido
+     * Complejidad: O(|V|+|E|) donde |E| es la cantidad de arcos y |V| es la cantidad de vértices
+     * @param graph grafo dirigido
+     * @param vertex vértice inicial
+     * @param visited conjunto de vértices visitados
+     * @param result conjunto de vértices visitados en orden de finalización
+    */
+    private static void dfs(Graph<Integer> graph, Vertex<Integer> vertex, Set<Vertex<Integer>> visited, Collection<Vertex<Integer>> result) {
+        // Agregamos el vértice al conjunto de vértices visitados
+        visited.add(vertex);
+        // Recorremos los vértices adyacentes al vértice actual
+        for (Vertex<Integer> adjacentVertex : graph.getOutwardEdges(vertex)) {
+            // Si el vértice adyacente no ha sido visitado, hacemos DFS
+            if (!visited.contains(adjacentVertex)) {
+                dfs(graph, adjacentVertex, visited, result);
+            }
+        }
+        // Agregamos el vértice al conjunto de vértices visitados en orden de finalización
+        result.add(vertex);
+    }
 
     /**
-     * Ejecuta el algoritmo de Floyd-Warshall para saber donde se pueden colocar bloques de agua sin que se inunde la ciudad
-     * Complejidad: O(|V|^3) donde |V| es la cantidad de vertices del grafo
-     * @param matriz
-     * @param estados
-     * @param filas
-     * @param columnas
-     * @return max (la cantidad maxima de bloques de agua que se pueden colocar)
+     * Retorna el grafo simetrico de un grafo dirigido
+     * Complejidad: O(|V|*|E|) donde |V| es la cantidad de vértices y |E| es la cantidad de arcos
+     * @param graph grafo dirigido
+     * @return grafo simetrico
     */
-    public static int floydWarshall(int[][] matriz, Estados[][] estados, int filas, int columnas) {
-        // Inicializamos la matriz de distancias
-        int[] mutableInt = new int[1];
-        mutableInt[0] = 0;
+    private static Graph<Integer> simetrico(Graph<Integer> graph) {
+        // Creamos un nuevo grafo
+        Graph<Integer> transposedGraph = new AdjacencyListGraph<>();
 
-        // Recorremos la matriz
-        for (int i = 1; i < filas - 1; i++){
-            for (int j = 1; j < columnas - 1; j++){
-                // Si la posicion actual es un borde, no se puede colocar un bloque de agua
-                if (estados[i][j].getStatus() != Estado.VACIO) {
-                    fill(matriz, estados, i, j, mutableInt);
+        // Agregamos los vértices al grafo simetrico
+        for (Vertex<Integer> vertex : graph.getAllVertices()) {
+            transposedGraph.add(vertex);
+        }
+
+        // Conectamos los vértices del grafo simetrico
+        for (Vertex<Integer> vertex : graph.getAllVertices()) {
+            // Recorremos los vértices que tengan arcos de entrada en el vértice actual.
+            // Estos vértices serán los vértices de salida en el grafo simetrico.
+            for (Vertex<Integer> adjacentVertex : graph.getInwardEdges(vertex)) {
+                transposedGraph.connect(vertex, adjacentVertex);
+            }
+        }
+
+        return transposedGraph;
+    }
+    
+    /**
+     * Retorna un grafo reducido a partir de un grafo dirigido y una lista de conjuntos de vértices que representan las componentes fuertemente conexas del grafo
+     * Complejidad: O(|V|*|E|) donde |V| es la cantidad de vértices y |E| es la cantidad de arcos
+     * @param graph grafo dirigido
+     * @param CFC lista de conjuntos de vértices. Cada conjunto representa una componente fuertemente conexa
+     * @return grafo reducido
+    */
+    public static Graph<Integer> reducirGrafo(Graph<Integer> graph, List<Set<Vertex<Integer>>> CFC){
+        // Creamos un nuevo grafo
+        Graph<Integer> reducedGraph = new AdjacencyListGraph<>();
+        // Obtenemos los vértices del grafo original en orden de finalización
+        List<Vertex<Integer>> vertices = graph.getAllVertices();
+
+        // Agregamos un vertice por cada componente fuertemente conexa, el costo de cada vertice es el de cualquier vertice de la componente fuertemente conexa
+        // ya que todos los vertices de una componente fuertemente conexa tienen el mismo costo.
+        for (Set<Vertex<Integer>> componente : CFC) {
+            Vertex<Integer> vertex = componente.iterator().next();
+            reducedGraph.add(vertex);
+        }
+        
+
+        // Conectamos los vértices del grafo reducido
+        for (Vertex<Integer> vertex : vertices) {
+            // Recorremos los vértices que tengan arcos de salida en el vértice actual.
+            // Estos vértices serán los vértices de entrada en el grafo reducido.
+            for (Vertex<Integer> adjacentVertex : graph.getOutwardEdges(vertex)) {
+                // Si el vértice actual y el vértice adyacente no pertenecen a la misma componente fuertemente conexa, conectamos los vértices en el grafo reducido
+                if (!perteneceAComponente(vertex, adjacentVertex, CFC)) {
+                    reducedGraph.connect(vertex, adjacentVertex);
                 }
             }
         }
 
-        return mutableInt[0];
+        return reducedGraph;
+    }
+
+    /**
+     * Retorna true si dos vértices pertenecen a la misma componente fuertemente conexa
+     * Complejidad: O(|CC|) donde |CC| es la cantidad de componentes fuertemente conexas
+     * @param vertex1 vértice 1
+     * @param vertex2 vértice 2
+     * @param CFC lista de conjuntos de vértices. Cada conjunto representa una componente fuertemente conexa
+     * @return true si los vértices pertenecen a la misma componente fuertemente conexa
+    */
+    private static boolean perteneceAComponente(Vertex<Integer> vertex1, Vertex<Integer> vertex2, List<Set<Vertex<Integer>>> CFC) {
+        // Recorremos las componentes fuertemente conexas
+        for (Set<Vertex<Integer>> componente : CFC) {
+            // Si la componente fuertemente conexa contiene a los dos vértices, retornamos true
+            if (componente.contains(vertex1) && componente.contains(vertex2)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
