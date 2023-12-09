@@ -23,13 +23,10 @@ public class AlfonsoJose {
         // Construimos el grafo reducido a partir del grafo y las componentes fuertemente conexas
         Graph<Integer> grafoReducido = reducirGrafo(grafo, CFC);
 
-        int[] mutableInt = {0};
         // Calculamos la cantidad de cubos máximos de agua que se pueden usar para inundar Atlantis
-        cubosMaximos(matriz, grafoReducido, CFC, mutableInt);
-
-        int cubosMaximos = mutableInt[0];
+        int cubosMaximos = cubosMaximos(matriz, grafoReducido, CFC);
         // Imprimimos la cantidad de cubos máximos de agua que se pueden usar para inundar Atlantis
-        System.out.println("Cantidad de cubos máximos de agua que se pueden usar para inundar Atlantis: " + cubosMaximos);
+        System.out.println("Cantidad de cubos máximos de agua que se pueden usar para inundar Atlantis: " + "\u001B[93m" + cubosMaximos + " cubos" + "\u001B[0m");
         
     }
 
@@ -119,6 +116,12 @@ public class AlfonsoJose {
         return matriz;
     }
 
+    /**
+     * Construye un grafo a partir de una matriz
+     * Complejidad: O(|V|*|E|) donde |V| es la cantidad de vertices del grafo y |E| es la cantidad de arcos del grafo
+     * @param matriz matriz de costos (Altura de cada bloque)
+     * @return grafo
+     */
     public static Graph<Integer> construitGrafo(int[][] matriz){
         Graph<Integer> grafo = new AdjacencyListGraph<>();
         // Llenamos la matriz con los datos del archivo
@@ -249,8 +252,6 @@ public class AlfonsoJose {
     public static Graph<Integer> reducirGrafo(Graph<Integer> graph, List<Set<Vertex<Integer>>> CFC){
         // Creamos un nuevo grafo
         Graph<Integer> reducedGraph = new AdjacencyListGraph<>();
-        // Obtenemos los vértices del grafo original en orden de finalización
-        List<Vertex<Integer>> vertices = graph.getAllVertices();
 
         // Agregamos un vertice por cada componente fuertemente conexa, el costo de cada vertice es el de cualquier vertice de la componente fuertemente conexa
         // ya que todos los vertices de una componente fuertemente conexa tienen el mismo costo.
@@ -261,13 +262,12 @@ public class AlfonsoJose {
         
 
         // Conectamos los vértices del grafo reducido
-        for (Vertex<Integer> vertex : vertices) {
-            // Recorremos los vértices que tengan arcos de salida en el vértice actual.
-            // Estos vértices serán los vértices de entrada en el grafo reducido.
+        for (Vertex<Integer> vertex : graph.getAllVertices()) {
+            // Recorremos los vértices adyacentes al vértice actual
             for (Vertex<Integer> adjacentVertex : graph.getOutwardEdges(vertex)) {
-                // Si el vértice actual y el vértice adyacente no pertenecen a la misma componente fuertemente conexa, conectamos los vértices en el grafo reducido
+                // Si el vértice adyacente no pertenece a la misma componente fuertemente conexa que el vértice actual, conectamos los vértices en el grafo reducido
                 if (!perteneceAComponente(vertex, adjacentVertex, CFC)) {
-                    reducedGraph.connect(vertex, adjacentVertex);
+                    reducedGraph.connect(buscarComponente(vertex, CFC).iterator().next(), buscarComponente(adjacentVertex, CFC).iterator().next());
                 }
             }
         }
@@ -296,34 +296,45 @@ public class AlfonsoJose {
 
     /**
      * Calcula la cantidad de cubos máximos de agua que se pueden usar para inundar Atlantis
-     * Complejidad: O(?)
+     * Complejidad: O(|V|*|E|) donde |V| es la cantidad de vértices y |E| es la cantidad de arcos
      * @param matriz matriz de costos (Altura de cada bloque)
      * @param grafoReducido grafo reducido a componentes fuertemente conexas
      * @return cantidad de cubos máximos de agua que se pueden usar para inundar Atlantis
      */
-    public static void cubosMaximos(int[][] matriz, Graph<Integer> grafoReducido, List<Set<Vertex<Integer>>> CFC, int[] mutableInt){
-        Graph<Integer> graphAux = grafoReducido;
+    public static int cubosMaximos(int[][] matriz, Graph<Integer> grafoReducido, List<Set<Vertex<Integer>>> CFC){
+        int counter = 0;
+        // Obtenemos los vértices sumideros del grafo reducido
+        List<Vertex<Integer>> sumideros = getSumideros(grafoReducido);
 
-        List<Vertex<Integer>> fuentes = getFuentes(graphAux);
-        List<Vertex<Integer>> sumideros = getSumideros(graphAux);
-        
-        // Imprimimos las componentes fuertemente conexas
-        imprimirCC(CFC);
+        // Iteramos mientras haya vértices sumideros
+        while (sumideros.size() > 0) {
+            // Iteramos sobre los vértices sumideros
+            for (Vertex<Integer> sumidero : sumideros) {
+                // Revisamos si el vértice sumidero es borde
+                if (hayUnBorde(sumidero, matriz, CFC)) {
+                    // Si el vértice sumidero es borde, entonces no se puede inundar ese bloque
+                    // Eliminamos el vértice sumidero del grafo reducido
+                    grafoReducido.remove(sumidero);
+                    continue;
+                }
+                // Obtenemos el predecesor con menor costo del vértice sumidero
+                Vertex<Integer> predecesorMin = predecesorMin(sumidero, grafoReducido);
+                // Obtenemos el tamaño de la componente fuertemente conexa a la que pertenece el vértice sumidero
+                int sizeCFC = getSizeCFC(sumidero, CFC);
+                // Aumentamos el contador de cubos máximos
+                counter += (predecesorMin.getCost() - sumidero.getCost()) * sizeCFC;
+                // Actualizamos el costo del sumidero y luego el de la componente fuertemente conexa a la que pertenece el sumidero
+                sumidero.setCost(predecesorMin.getCost());
+                actualizarCostoCFC(sumidero, CFC);
+                // Unimos las componentes fuertemente conexas a las que pertenecen el sumidero y su predecesor en un solo conjunto
+                // Ademas, convertimos unimos los vértices sumidero y predecesor en un solo vértice (Y cualquier otro predecesor del sumidero con el mismo costo que el predecesor del sumidero)
+                unirCFC(grafoReducido, sumidero, predecesorMin, CFC);
+            }
+            // Actualizamos la lista de vértices sumideros
+            sumideros = getSumideros(grafoReducido);
+        }
 
-        // Imprimimos las fuentes
-        System.out.println("Fuentes: " + fuentes);
-
-        // Imprimimos los sumideros
-        System.out.println("Sumideros: " + sumideros);
-
-        // Imprimimos el grafo reducido
-        System.out.println("Grafo reducido: ");
-        System.out.println(graphAux);
-
-        // Imprimimos la matriz
-        imprimirMatriz(matriz);
-        
-        // TODO: Calcular la cantidad de cubos máximos de agua que se pueden usar para inundar Atlantis
+        return counter;
     }
 
     /**
@@ -334,12 +345,37 @@ public class AlfonsoJose {
      * @return true si el vértice es borde
      */
     private static boolean esBorde(Vertex<Integer> vertex, int[][] matriz) {
+        // Obtenemos la posición del vértice en la matriz
         int i = vertex.getId()/matriz[0].length;
         int j = vertex.getId()%matriz[0].length;
-        System.out.println("i: " + i + " j: " + j);
-        System.out.println("v: " + vertex);
+        // Si el vértice está en el borde de la matriz, retornamos true
         if (i == 0 || i == matriz.length-1 || j == 0 || j == matriz[0].length-1) {
             return true;
+        }
+        return false;
+    }
+
+    /**
+     * Retorna true si un vértice de la componente fuertemente conexa a la que pertenece un vértice es borde
+     * Complejidad: O(1)
+     * @param vertex vértice sumidero
+     * @param matriz matriz de costos (Altura de cada bloque)
+     * @param CFC lista de conjuntos de vértices. Cada conjunto representa una componente fuertemente conexa
+     * @return true si un vértice de la componente fuertemente conexa a la que pertenece un vértice es borde
+     */
+    private static boolean hayUnBorde(Vertex<Integer> vertex, int[][] matriz, List<Set<Vertex<Integer>>> CFC) {
+        // Obtenemos la componente fuertemente conexa a la que pertenece el vértice
+        Set<Vertex<Integer>> componente = buscarComponente(vertex, CFC);
+        // Si la componente fuertemente conexa es null, retornamos false
+        if (componente == null) {
+            return false;
+        }
+        // Recorremos los vértices de la componente fuertemente conexa
+        for (Vertex<Integer> v : componente) {
+            // Si existe un vértice borde en la componente fuertemente conexa, retornamos true
+            if (esBorde(v, matriz)) {
+                return true;
+            }
         }
         return false;
     }
@@ -351,29 +387,16 @@ public class AlfonsoJose {
      * @return lista de vértices sumideros
      */
     private static List<Vertex<Integer>> getSumideros(Graph<Integer> graph) {
+        // Creamos una lista de vértices sumideros
         List<Vertex<Integer>> sumideros = new ArrayList<>();
+        // Recorremos los vértices del grafo
         for (Vertex<Integer> vertex : graph.getAllVertices()) {
+            // Si el vértice no tiene arcos de salida y tiene arcos de entrada, lo agregamos a la lista de sumideros
             if (graph.getOutDegree(vertex) == 0 && graph.getInDegree(vertex) > 0) {
                 sumideros.add(vertex);
             }
         }
         return sumideros;
-    }
-
-    /**
-     * Retorna una lista de vértices fuentes
-     * Complejidad: O(|V|*|E|) donde |V| es la cantidad de vértices y |E| es la cantidad de arcos
-     * @param graph grafo dirigido
-     * @return lista de vértices fuentes
-     */
-    private static List<Vertex<Integer>> getFuentes(Graph<Integer> graph) {
-        List<Vertex<Integer>> fuentes = new ArrayList<>();
-        for (Vertex<Integer> vertex : graph.getAllVertices()) {
-            if (graph.getInDegree(vertex) == 0 && graph.getOutDegree(vertex) > 0) {
-                fuentes.add(vertex);
-            }
-        }
-        return fuentes;
     }
 
     /**
@@ -384,9 +407,12 @@ public class AlfonsoJose {
      * @return predecesor con menor costo
      */
     private static Vertex<Integer> predecesorMin(Vertex<Integer> vertex, Graph<Integer> graph) {
+        // Inicializamos el predecesor con menor costo y el costo mínimo
         Vertex<Integer> predecesorMin = null;
         int costoMin = Integer.MAX_VALUE;
+        // Recorremos los vértices predecesores al vértice actual
         for (Vertex<Integer> predecesor : graph.getInwardEdges(vertex)) {
+            // Si el costo del predecesor es menor que el costo mínimo, actualizamos el predecesor con menor costo y el costo mínimo
             if (predecesor.getCost() < costoMin) {
                 predecesorMin = predecesor;
                 costoMin = predecesor.getCost();
@@ -403,11 +429,88 @@ public class AlfonsoJose {
      * @return tamaño de la componente fuertemente conexa a la que pertenece un vértice
      */
     private static int getSizeCFC(Vertex<Integer> vertex, List<Set<Vertex<Integer>>> CFC) {
+        // Recorremos las componentes fuertemente conexas
         for (Set<Vertex<Integer>> componente : CFC) {
+            // Si la componente fuertemente conexa contiene al vértice, retornamos el tamaño de la componente fuertemente conexa
             if (componente.contains(vertex)) {
                 return componente.size();
             }
         }
         return 0;
+    }
+
+    /**
+     * Actualiza el costo de la componente fuertemente conexa a la que pertenece un vértice
+     * Complejidad: O(|V|) donde |V| es la cantidad de vértices
+     * @param representante vértice
+     * @param CFC lista de conjuntos de vértices. Cada conjunto representa una componente fuertemente conexa
+     */
+    private static void actualizarCostoCFC(Vertex<Integer> representante, List<Set<Vertex<Integer>>> CFC) {
+        // Obtenemos la componente fuertemente conexa a la que pertenece el vértice
+        Set<Vertex<Integer>> componente = buscarComponente(representante, CFC);
+        // Actualizamos los costos de los vértices de la componente fuertemente conexa
+        for (Vertex<Integer> vertex : componente) {
+            vertex.setCost(representante.getCost());
+        }
+    }
+
+    /**
+     * Une dos componentes fuertemente conexas en un solo conjunto
+     * Complejidad: O(|CC|) donde |CC| es la cantidad de componentes fuertemente conexas
+     * @param graph grafo dirigido
+     * @param sumidero vértice 1
+     * @param predecesor vértice 2
+     * @param CFC lista de conjuntos de vértices. Cada conjunto representa una componente fuertemente conexa
+     */
+    private static void unirCFC(Graph<Integer> graph, Vertex<Integer> sumidero, Vertex<Integer> predecesor, List<Set<Vertex<Integer>>> CFC) {
+        // Obtenemos la componente fuertemente conexa a la que pertenece el predecesor y la componente fuertemente conexa a la que pertenece el sumidero
+        Set<Vertex<Integer>> componenteSum = buscarComponente(sumidero, CFC);
+        Set<Vertex<Integer>> componentePre = buscarComponente(predecesor, CFC);
+        // Si el predecesor y el sumidero pertenecen a la misma componente fuertemente conexa, no hacemos nada
+        if (componenteSum.equals(componentePre)) {
+            return;
+        }
+        // Unimos las componentes fuertemente conexas en un solo conjunto
+        componentePre.addAll(componenteSum);
+        // Eliminamos la componente fuertemente conexa del sumidero
+        CFC.remove(componenteSum);
+
+        // Recorremos los vértices predecesores al sumidero
+        for (Vertex<Integer> vertex : graph.getInwardEdges(sumidero)) {
+            // Si el vértice predecesor es el mismo sumidero, no hacemos nada
+            if (vertex.equals(predecesor)) {
+                continue;
+            }
+            // Si el vértice predecesor tiene el mismo costo que el predecesor del sumidero, lo unimos con el predecesor del sumidero
+            if (vertex.getCost() == predecesor.getCost()) {
+                // Unimos las componentes fuertemente conexas a las que pertenecen el vértice predecesor y el predecesor del sumidero en un solo conjunto
+                for (Vertex<Integer> v : graph.getOutwardEdges(vertex)){
+                    graph.connect(predecesor, v);
+                }
+                unirCFC(graph, vertex, predecesor, CFC);
+            }
+            // Conectamos el predecesor del sumidero con el vértice predecesor
+            graph.connect(vertex, predecesor);
+        }
+        // Eliminamos el sumidero del grafo
+        graph.remove(sumidero);
+    }
+
+    /**
+     * Retorna la componente fuertemente conexa a la que pertenece un vértice
+     * Complejidad: O(|CC|) donde |CC| es la cantidad de componentes fuertemente conexas
+     * @param vertex vértice
+     * @param CFC lista de conjuntos de vértices. Cada conjunto representa una componente fuertemente conexa
+     * @return componente fuertemente conexa a la que pertenece un vértice
+     */
+    private static Set<Vertex<Integer>> buscarComponente(Vertex<Integer> vertex, List<Set<Vertex<Integer>>> CFC) {
+        // Recorremos las componentes fuertemente conexas
+        for (Set<Vertex<Integer>> componente : CFC) {
+            // Si la componente fuertemente conexa contiene al vértice, retornamos la componente fuertemente conexa
+            if (componente.contains(vertex)) {
+                return componente;
+            }
+        }
+        return null;
     }
 }
