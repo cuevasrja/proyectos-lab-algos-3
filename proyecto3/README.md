@@ -52,27 +52,30 @@ Si el vértice sumidero no es un borde, entonces se calcula el predecesor mínim
 
 Al no tener vértices sumideros, podemos entender que la ciudad está llena de agua lo más posible, por lo que devolvemos el resultado.
 
-| Método | Complejidad |
-| ------ | ----------- |
+| Método                        | Complejidad       |
+| ----------------------------- | ------------------ |
 | colorear                      | O(1)               |
-| imprimirCC                    | O(|CC|)            |
-| imprimirMatriz                | O(|V|)             |
-| leerArchivo                   | O(|V|)             |
-| construirGrafo                | O(|V|*|E|)         |
-| componentesFuertementeConexas | O(|V|*|E|)         |
-| dfs                           | O(|V|+|E|)         |
-| simetrico                     | O(|V|*|E|)         |
-| reducirGrafo                  | O(|V|*|E|)         |
-| perteneceAComponente          | O(|V|)             |
-| cubosMaximos                  | O(|V|*|E|)         |
+| imprimirCC                    | O(\|CC\|)          |
+| imprimirMatriz                | O(\|V\|)           |
+| leerArchivo                   | O(\|V\|)           |
+| construirGrafo                | O(\|V\|*\|E\|)     |
+| componentesFuertementeConexas | O(\|V\|*\|E\|)     |
+| dfs                           | O(\|V\|*\|E\|)     |
+| simetrico                     | O(\|V\|*\|E\|)     |
+| reducirGrafo                  | O(\|V\|*\|E\|)     |
+| perteneceAComponente          | O(\|V\|)           |
+| cubosMaximos                  | O(\|V\|*\|E\|)     |
 | esBorde                       | O(1)               |
-| hayUnBorde                    | O(|V|)             |
-| getSumideros                  | O(|V|*|E|)         |
-| predecesorMin                 | O(|E|)             |
-| getSizeCFC                    | O(|V|)             |
-| actualizarCostoCFC            | O(|V|)             |
-| unirCFC                       | O(|V|)             |
-| buscarComponente              | O(|V|)             |
+| hayUnBorde                    | O(\|V\|)           |
+| getSumideros                  | O(\|V\|*\|E\|)     |
+| predecesorMin                 | O(\|E\|)           |
+| getSizeCFC                    | O(\|V\|)           |
+| actualizarCostoCFC            | O(\|V\|)           |
+| unirCFC                       | O(\|V\|)           |
+| buscarComponente              | O(\|V\|)           |
+
+> [!IMPORTANT]
+> Se tiene que \|V\| es la cantidad de vértices del grafo original, y \|E\| es la cantidad de arcos del grafo original. Además, \|CC\| es la cantidad de componentes fuertemente conexas del grafo original.
 
 > [!NOTE] 
 > Más detalles sobre la complejidad de cada método se encuentran en los comentarios del código de la clase `AlfonsoJose`.
