@@ -1,4 +1,4 @@
-# Proyecto 2: Mundo Cubo
+# Proyecto 3: Mundo Cubo
 
 ## Descripción
 
