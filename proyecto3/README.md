@@ -34,17 +34,50 @@ Para ejecutar el programa, se debe ejecutar el siguiente comando en la terminal:
 java AlfonsoJose
 ```
 
-**Nota**: Debe existir un archivo _atlantis.txt_ en el mismo directorio que el resto del proyecto, con el formato descrito en la sección anterior.
+> [!IMPORTANT]
+> Debe existir un archivo _atlantis.txt_ en el mismo directorio que el resto del proyecto, con el formato descrito en la sección anterior.
 
 ## Explicación de la Solución Propuesta (con Complejidades)
 
+Para resolver el problema, se implementó la clase `AlfonsoJose`, la cual contiene un método `main` que lee el archivo _atlantis.txt_ y devuelve la cantidad de cubos de agua que se necesitan para llenar el mundo cubo lo más posible. Primeramente, se lee el archivo y se almacena en una matriz de enteros. Luego, se crea un grafo dirigido con la misma cantidad de vértices que la matriz, donde cada vértice representa una posición de la matriz. Luego, se recorre la matriz y se agregan las aristas correspondientes al grafo, de manera que los
+arcos estan definidos de la siguiente manera:
+
+    Para todo par de vértices (i, j) y (k, l) en el grafo, existe un arco de (i, j) a (k, l) si y solo si la altura de la torre de cubos en la posición (i, j) es mayor que la altura de la torre de cubos en la posición (k, l) y (i, j) y (k, l) son adyacentes en la matriz.
+
+Luego, se calculan las componentes fuertemente conexas del grafo usando el metodo `componentesFuertementeConexas`. Posteriormente, se crea un grafo reducido a partir del grafo original usando el método `reducirGrafo`, en el cual cada componente fuertemente conexa del grafo original se convierte en un vértice del grafo reducido. Luego, se calculan los cubos máximos de agua que se pueden almacenar en cada componente fuertemente conexa usando el método `cubosMaximos`. 
+
+Dentro de `cubosMaximos`, iteramos hasta que el grafo reducido no tenga vértices sumideros, es decir, vértices que no tengan arcos salientes pero sí arcos entrantes. En cada iteración, se calculan los vértices sumideros del grafo reducido usando el método `getSumideros`, e iteramos sobre los vértices sumideros. Si el vértice sumidero es un borde, entonces se elimina del grafo reducido y continuamos con el siguiente vértice sumidero. 
+
+Si el vértice sumidero no es un borde, entonces se calcula el predecesor mínimo del vértice sumidero usando el método `predecesorMin`, luego actualizamos nuestra variable de resultado sumándole el costo del predecesor mínimo del vértice sumidero menos el sumidero, por el tamaño de la componente fuertemente conexa del vértice sumidero calculado usando el método `getSizeCFC`. Posteriormente, se actualiza el costo de la componente fuertemente conexa del vértice sumidero usando el método `actualizarCostoCFC`. Finalmente, se unen las componentes fuertemente conexas del vertice sumidero y su predecesor mínimo usando el método `unirCFC`.
+
+Al no tener vértices sumideros, podemos entender que la ciudad está llena de agua lo más posible, por lo que devolvemos el resultado.
+
 | Método | Complejidad |
 | ------ | ----------- |
-|        |             |
+| colorear                      | O(1)               |
+| imprimirCC                    | O(|CC|)            |
+| imprimirMatriz                | O(|V|)             |
+| leerArchivo                   | O(|V|)             |
+| construirGrafo                | O(|V|*|E|)         |
+| componentesFuertementeConexas | O(|V|*|E|)         |
+| dfs                           | O(|V|+|E|)         |
+| simetrico                     | O(|V|*|E|)         |
+| reducirGrafo                  | O(|V|*|E|)         |
+| perteneceAComponente          | O(|V|)             |
+| cubosMaximos                  | O(|V|*|E|)         |
+| esBorde                       | O(1)               |
+| hayUnBorde                    | O(|V|)             |
+| getSumideros                  | O(|V|*|E|)         |
+| predecesorMin                 | O(|E|)             |
+| getSizeCFC                    | O(|V|)             |
+| actualizarCostoCFC            | O(|V|)             |
+| unirCFC                       | O(|V|)             |
+| buscarComponente              | O(|V|)             |
 
-**Nota:** Más detalles sobre la complejidad de cada método se encuentran en los comentarios del código de la clase `AlfonsoJose`.
+> [!NOTE] 
+> Más detalles sobre la complejidad de cada método se encuentran en los comentarios del código de la clase `AlfonsoJose`.
 
 ## Grupo de Laboratorio
 
 - Juan Cuevas [@cuevasrja](https://github.com/cuevasrja) (19-10056).
-- Luis Isea [@lmisea](https://github.com/lmisea) (19-10175).
+- Luis Isea [@lmisea](https://github.com/lmisea) (19-10175). NO TRABAJÓ EN EL PROYECTO.

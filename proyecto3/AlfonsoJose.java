@@ -59,6 +59,11 @@ public class AlfonsoJose {
         System.out.println("");
     }
 
+    /**
+     * Imprime una matriz
+     * Complejidad: O(|V|) donde |V| es la cantidad de vertices del grafo
+     * @param matriz
+     */
     public static void imprimirMatriz(int[][] matriz){
         for (int i = 0; i < matriz.length; i++) {
             System.out.print("[");
@@ -277,7 +282,7 @@ public class AlfonsoJose {
 
     /**
      * Retorna true si dos vértices pertenecen a la misma componente fuertemente conexa
-     * Complejidad: O(|CC|) donde |CC| es la cantidad de componentes fuertemente conexas
+     * Complejidad: O(|V|) donde |V| es la cantidad de vértices
      * @param vertex1 vértice 1
      * @param vertex2 vértice 2
      * @param CFC lista de conjuntos de vértices. Cada conjunto representa una componente fuertemente conexa
@@ -357,7 +362,7 @@ public class AlfonsoJose {
 
     /**
      * Retorna true si un vértice de la componente fuertemente conexa a la que pertenece un vértice es borde
-     * Complejidad: O(1)
+     * Complejidad: O(|V|) donde |V| es la cantidad de vértices
      * @param vertex vértice sumidero
      * @param matriz matriz de costos (Altura de cada bloque)
      * @param CFC lista de conjuntos de vértices. Cada conjunto representa una componente fuertemente conexa
@@ -423,7 +428,7 @@ public class AlfonsoJose {
 
     /**
      * Retorna el tamaño de la componente fuertemente conexa a la que pertenece un vértice
-     * Complejidad: O(|CC|) donde |CC| es la cantidad de componentes fuertemente conexas
+     * Complejidad: O(|V|) donde |V| es la cantidad de vértices
      * @param vertex vértice
      * @param CFC lista de conjuntos de vértices. Cada conjunto representa una componente fuertemente conexa
      * @return tamaño de la componente fuertemente conexa a la que pertenece un vértice
@@ -456,7 +461,7 @@ public class AlfonsoJose {
 
     /**
      * Une dos componentes fuertemente conexas en un solo conjunto
-     * Complejidad: O(|CC|) donde |CC| es la cantidad de componentes fuertemente conexas
+     * Complejidad: O(|V|) donde |V| es la cantidad de vértices
      * @param graph grafo dirigido
      * @param sumidero vértice 1
      * @param predecesor vértice 2
@@ -498,7 +503,7 @@ public class AlfonsoJose {
 
     /**
      * Retorna la componente fuertemente conexa a la que pertenece un vértice
-     * Complejidad: O(|CC|) donde |CC| es la cantidad de componentes fuertemente conexas
+     * Complejidad: O(|V|) donde |V| es la cantidad de vértices
      * @param vertex vértice
      * @param CFC lista de conjuntos de vértices. Cada conjunto representa una componente fuertemente conexa
      * @return componente fuertemente conexa a la que pertenece un vértice
